@@ -130,93 +130,26 @@ st.markdown("""
 # DISCLAIMER
 # =======================
 
-if "show_disclaimer" not in st.session_state:
-    st.session_state.show_disclaimer = True
-
-if st.session_state.show_disclaimer:
-    st.markdown("""
-    <div style="
-        background-color: #fff3cd;
-        border-left: 6px solid #ffca2c;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: #000;
-        margin-bottom: 25px;
-        font-size: 15px;
-    ">
-    <b>⚠️ DISCLAIMER IMPORTANT</b><br><br>
-    L’accès au backtest est exclusivement réservé aux membres de la Team Élite de la chaîne KBOUR Crypto.
-    Le code d’accès est disponible dans le canal privé <b>« DEFI Académie »</b>.
-    <br><br>
-
-    <b>🔐 Confidentialité & données</b><br>
-    L’adresse du wallet saisie par l’utilisateur est traitée et stockée <b>uniquement en local dans le navigateur</b> pendant la session.
-    Aucune donnée personnelle, adresse de wallet ou information sensible n’est enregistrée, transmise ou exploitée sur un serveur externe.<br><br>
-
-    <b>Nature de l’analyse</b><br>
-    L’analyse du wallet est <b>purement statistique et indicative</b>, réalisée exclusivement en fonction du
-    <b>profil de risque sélectionné (SAFE / MID / DEGEN)</b>.
-    Les résultats affichés ne tiennent pas compte de la situation personnelle de l’utilisateur,
-    des conditions de marché en temps réel ou de paramètres externes, et
-    <b>ne constituent en aucun cas un conseil financier ou une recommandation d’investissement</b>.
-    </div>
-    """, unsafe_allow_html=True)
+st.markdown("""
+<div style="
+    background-color: #fff3cd;
+    border-left: 6px solid #ffca2c;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: #000;
+    margin-bottom: 25px;
+    font-size: 15px;
+">
+<b>⚠️ DISCLAIMER IMPORTANT</b><br><br>
+L’analyse du wallet est <b>purement statistique et indicative</b>, réalisée en fonction du
+<b>profil de risque sélectionné (SAFE / MID / DEGEN)</b>.<br>
+Les montants saisis restent <b>uniquement en local dans le navigateur</b> et ne sont jamais stockés ou transmis à un serveur.<br>
+Ces informations <b>ne constituent pas un conseil financier</b>.
+</div>
+""", unsafe_allow_html=True)
 
 # =======================
-# AUTHENTIFICATION
-# =======================
-
-SECRET_CODE = "WALLET"
-
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-if not st.session_state.authenticated:
-
-    st.markdown("""
-    <style>
-    .login-card {
-        background: linear-gradient(135deg, #0a0f1f 0%, #1e2761 40%, #4b1c7d 100%);
-        padding: 28px 30px;
-        border-radius: 18px;
-        max-width: 420px;
-        margin: 3rem auto;
-        border: 1px solid rgba(255,255,255,0.12);
-        box-shadow: 0px 4px 18px rgba(0,0,0,0.45);
-        text-align: center;
-    }
-    .login-title { font-size: 28px; font-weight: 700; color: white; }
-    .login-subtitle { font-size: 14px; color: #d1d5db; margin-bottom: 18px; }
-    </style>
-
-    <div class="login-card">
-        <div class="login-title">Accès sécurisé</div>
-        <div class="login-subtitle">
-            Réservé aux membres de la <b>Team Élite</b><br>
-            Code disponible dans <b>DEFI Académie</b>
-        </div>
-        <a href="https://www.youtube.com/channel/UCZL_vS9bsLI4maA4Oja9zyg/join"
-           target="_blank"
-           style="background:#facc15;color:#111827;
-           padding:10px 18px;border-radius:14px;
-           font-weight:700;display:inline-block;">
-           Rejoindre la Team Élite
-        </a>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.text_input("Code d'accès", key="secret_code", type="password")
-    if st.button("Valider", use_container_width=True):
-        if st.session_state.secret_code == SECRET_CODE:
-            st.session_state.authenticated = True
-            st.rerun()
-        else:
-            st.error("Code incorrect")
-
-    st.stop()
-
-# =======================
-# DEFI STRATEGY ANALYZER
+# STRATEGIES
 # =======================
 
 STRATEGIES = {
@@ -239,25 +172,9 @@ STRATEGIES = {
 
 ASSETS = ["hodl", "lending", "liquidity_pool", "borrowing"]
 
-def get_portfolio_from_evm(address):
-    if not address or not address.startswith("0x"):
-        return None
-    seed = int(address[-4:], 16) % 100
-    hodl = 2500 + seed * 10
-    lending = 3500 + seed * 15
-    lp = 2500 + seed * 10
-    borrowing = 1000 + seed * 5
-    return {
-        "hodl": hodl,
-        "lending": lending,
-        "liquidity_pool": lp,
-        "borrowing": borrowing,
-        "total_exposure": hodl + lending + lp
-    }
-
-def normalize(p):
-    t = p["total_exposure"]
-    return {k: p[k] / t for k in ASSETS}
+def normalize(portfolio):
+    total = sum(portfolio[a] for a in ASSETS)
+    return {a: portfolio[a]/total if total > 0 else 0 for a in ASSETS}
 
 def detect_actions(strategy, current):
     actions = []
@@ -269,11 +186,18 @@ def detect_actions(strategy, current):
             actions.append(f"AUGMENTER {asset.upper()} de {-delta:.1%}")
     return actions
 
-left, right = st.columns([1, 2])
+# =======================
+# UI MANUEL
+# =======================
+
+left, right = st.columns([1,2])
 
 with left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    address = st.text_input("Adresse EVM", placeholder="0x...")
+    st.subheader("Saisie manuelle des montants du wallet ($)")
+    portfolio = {}
+    for asset in ASSETS:
+        portfolio[asset] = st.number_input(asset.upper(), min_value=0.0, value=0.0, step=100.0, format="%.2f")
     strategy_choice = st.radio("Profil de risque", list(STRATEGIES.keys()), horizontal=True)
     strategy = STRATEGIES[strategy_choice]
     st.info(strategy["description"])
@@ -282,21 +206,19 @@ with left:
 
 with right:
     if analyze:
-        p = get_portfolio_from_evm(address)
-        if not p:
-            st.error("Adresse invalide")
-            st.stop()
-        current = normalize(p)
+        current = normalize(portfolio)
         actions = detect_actions(strategy, current)
 
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.subheader("Répartition du portefeuille")
-        st.write(f"Exposition totale : ${p['total_exposure']:,.0f}")
+        total_exposure = sum(portfolio[a] for a in ASSETS)
+        st.write(f"Exposition totale : ${total_exposure:,.2f}")
         st.table({
-            "Catégorie": ["HODL", "LENDING", "LP", "BORROWING"],
+            "Catégorie": [a.upper() for a in ASSETS],
             "Actuel": [f"{current[a]:.1%}" for a in ASSETS],
-            "Cible": [f"{strategy['targets'][a]:.1%}" for a in ASSETS],
+            "Cible": [f"{strategy['targets'][a]:.1%}" for a in ASSETS]
         })
+
         st.subheader("Actions recommandées")
         if actions:
             for a in actions:
@@ -304,5 +226,3 @@ with right:
         else:
             st.success("Portefeuille aligné avec la stratégie")
         st.markdown('</div>', unsafe_allow_html=True)
-
-

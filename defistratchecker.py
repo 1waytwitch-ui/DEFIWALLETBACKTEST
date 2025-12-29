@@ -5,9 +5,114 @@ import streamlit as st
 # =======================
 
 st.set_page_config(
-    page_title="DeFi Strategy Analyzer",
+    page_title="DeFi wallet backtest",
     layout="wide"
 )
+
+# =======================
+# CUSTOM CSS (UI ONLY)
+# =======================
+
+st.markdown("""
+<style>
+
+/* ----- Global ----- */
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
+
+.stApp {
+    background: linear-gradient(135deg, #0b1026, #2b1464);
+    color: #ffffff;
+}
+
+/* ----- Titles ----- */
+h1, h2, h3 {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+h1 {
+    letter-spacing: 1px;
+}
+
+/* ----- Cards ----- */
+.card {
+    background: linear-gradient(135deg, #10183d, #3a1c71);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.35);
+    margin-bottom: 20px;
+}
+
+/* ----- Inputs ----- */
+.stTextInput input {
+    background-color: #0f1533;
+    color: white;
+    border-radius: 10px;
+    border: 1px solid #3c2c77;
+}
+
+/* ----- Radio buttons ----- */
+div[role="radiogroup"] {
+    background: #0f1533;
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid #3c2c77;
+}
+
+/* ----- Buttons ----- */
+.stButton button {
+    background: linear-gradient(135deg, #facc15, #f59e0b);
+    color: #000000;
+    font-weight: 700;
+    border-radius: 14px;
+    padding: 0.6em 1.6em;
+    border: none;
+    box-shadow: 0px 6px 20px rgba(250,204,21,0.35);
+    transition: all 0.2s ease;
+}
+
+.stButton button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 10px 30px rgba(250,204,21,0.5);
+}
+
+/* ----- Info / Success / Warning ----- */
+.stAlert {
+    border-radius: 14px;
+}
+
+.stAlert[data-baseweb="notification"] {
+    background-color: #10183d;
+}
+
+/* ----- Table ----- */
+table {
+    background-color: #0f1533 !important;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+thead tr th {
+    background-color: #1e2a6d !important;
+    color: #ffffff !important;
+}
+
+tbody tr td {
+    color: #ffffff !important;
+}
+
+/* ----- Footer ----- */
+.footer {
+    text-align: center;
+    opacity: 0.6;
+    margin-top: 30px;
+    font-size: 0.85rem;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 # =======================
 # STRATEGIES
@@ -104,8 +209,8 @@ def detect_actions(strategy, current):
 # UI
 # =======================
 
-st.title("DeFi Strategy Analyzer")
-st.caption("Lecture seule • Stratégies SAFE / MID / DEGEN")
+st.title("LP STRATEGIES • DeFi Strategy Analyzer")
+st.caption("Lecture seule • SAFE / MID / DEGEN")
 
 left, right = st.columns([1, 2])
 
@@ -114,11 +219,12 @@ left, right = st.columns([1, 2])
 # -----------------------
 
 with left:
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+
     st.subheader("Adresse EVM")
     address = st.text_input("Adresse", placeholder="0x...")
 
-    st.subheader("Choix de stratégie")
-
+    st.subheader("Stratégie")
     strategy_choice = st.radio(
         "Profil de risque",
         ["SAFE", "MID", "DEGEN"],
@@ -130,12 +236,16 @@ with left:
 
     analyze = st.button("Analyser")
 
+    st.markdown('</div>', unsafe_allow_html=True)
+
 # -----------------------
 # RESULTATS
 # -----------------------
 
 with right:
     if analyze:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+
         portfolio = get_portfolio_from_evm(address)
 
         if portfolio is None:
@@ -147,8 +257,8 @@ with right:
 
         st.subheader("Répartition du portefeuille")
 
-        st.write(f"Exposition totale : ${portfolio['total_exposure']:,.0f}")
-        st.write(f"Dette (Borrowing) : ${portfolio['borrowing']:,.0f}")
+        st.write(f"**Exposition totale :** ${portfolio['total_exposure']:,.0f}")
+        st.write(f"**Dette (Borrowing) :** ${portfolio['borrowing']:,.0f}")
 
         st.table({
             "Catégorie": ["HODL", "LENDING", "LIQUIDITY POOL", "BORROWING"],
@@ -175,3 +285,7 @@ with right:
                 st.warning(a)
 
         st.caption("Aucune transaction exécutée • Lecture seule")
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="footer">© DeFi Analyzer • Backtest UI</div>', unsafe_allow_html=True)

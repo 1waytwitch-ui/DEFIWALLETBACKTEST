@@ -1,8 +1,17 @@
 import streamlit as st
 
-# -----------------------
-# CONFIG
-# -----------------------
+# =======================
+# CONFIG UI (WIDESCREEN)
+# =======================
+
+st.set_page_config(
+    page_title="DeFi Strategy Checker",
+    layout="wide"
+)
+
+# =======================
+# STRATEGIE PAR DEFAUT
+# =======================
 
 DEFAULT_STRATEGY = {
     "cash": 0.20,
@@ -11,29 +20,37 @@ DEFAULT_STRATEGY = {
     "rebalance_threshold": 0.05
 }
 
-# -----------------------
-# MOCK EVM READER
-# (remplaçable par DeBank / Zapper)
-# -----------------------
+# =======================
+# MOCK LECTURE EVM
+# =======================
 
 def get_portfolio_from_evm(address: str):
     """
-    Mock simple : retourne un portefeuille fictif.
-    Plus tard : brancher une vraie API.
+    Mock simple par adresse.
+    Remplaçable par DeBank / Zapper.
     """
-    if not address or len(address) < 10:
+    if not address or not address.startswith("0x"):
         return None
 
+    # simulation différente selon l'adresse
+    seed = int(address[-4:], 16) % 100
+
+    cash = 1000 + seed * 10
+    lending = 4000 + seed * 20
+    lp = 3000 + seed * 15
+
+    total = cash + lending + lp
+
     return {
-        "cash": 1500,
-        "lending": 6200,
-        "liquidity_pool": 2300,
-        "total_usd": 10000
+        "cash": cash,
+        "lending": lending,
+        "liquidity_pool": lp,
+        "total_usd": total
     }
 
-# -----------------------
+# =======================
 # LOGIQUE METIER
-# -----------------------
+# =======================
 
 def normalize_portfolio(portfolio):
     total = portfolio["total_usd"]
@@ -53,92 +70,187 @@ def detect_actions(strategy, current):
         delta = actual - target
 
         if delta > threshold:
-            actions.append(
-                f"REDUIRE {asset.upper()} de {delta:.1%}"
-            )
+            actions.append(f"REDUIRE {asset.upper()} de {delta:.1%}")
         elif delta < -threshold:
-            actions.append(
-                f"AUGMENTER {asset.upper()} de {-delta:.1%}"
-            )
+            actions.append(f"AUGMENTER {asset.upper()} de {-delta:.1%}")
 
     return actions
 
-# -----------------------
-# UI STREAMLIT
-# -----------------------
+def aggregate_portfolios(portfolios):
+    aggregated = {
+        "cash": 0,
+        "lending": 0,
+        "liquidity_pool": 0,
+        "total_usd": 0
+    }
 
-st.set_page_config(page_title="DeFi Strategy Checker", layout="centered")
+    for p in portfolios:
+        for k in aggregated:
+            aggregated[k] += p[k]
+
+    return aggregated
+
+# =======================
+# UI
+# =======================
 
 st.title("DeFi Strategy Checker")
-st.subheader("Lecture seule – stratégie vs portefeuille réel")
+st.caption("Lecture seule • Analyse stratégie vs portefeuilles EVM")
 
-# ---- Adresse EVM ----
-address = st.text_input(
-    "Adresse EVM",
-    placeholder="0x..."
-)
+# -----------------------
+# LAYOUT PRINCIPAL
+# -----------------------
 
-# ---- Stratégie ----
-st.markdown("### Stratégie cible")
+left, right = st.columns([1, 2])
 
-cash_pct = st.slider("Cash / Stablecoins", 0.0, 1.0, DEFAULT_STRATEGY["cash"], 0.05)
-lending_pct = st.slider("Lending", 0.0, 1.0, DEFAULT_STRATEGY["lending"], 0.05)
-lp_pct = st.slider("Liquidity Pool", 0.0, 1.0, DEFAULT_STRATEGY["liquidity_pool"], 0.05)
+# =======================
+# COLONNE GAUCHE — INPUTS
+# =======================
 
-threshold = st.slider(
-    "Seuil de rééquilibrage",
-    0.01,
-    0.20,
-    DEFAULT_STRATEGY["rebalance_threshold"],
-    0.01
-)
+with left:
+    st.subheader("1. Adresses EVM (Bundle)")
 
-total = cash_pct + lending_pct + lp_pct
+    addresses_raw = st.text_area(
+        "Une adresse par ligne",
+        height=160,
+        placeholder="0x...\n0x...\n0x..."
+    )
 
-if abs(total - 1.0) > 0.001:
-    st.error("La somme des allocations doit être égale à 100 %")
-    st.stop()
+    addresses = [
+        a.strip() for a in addresses_raw.splitlines()
+        if a.strip()
+    ]
 
-strategy = {
-    "cash": cash_pct,
-    "lending": lending_pct,
-    "liquidity_pool": lp_pct,
-    "rebalance_threshold": threshold
-}
+    st.subheader("2. Stratégie cible")
 
-# ---- Analyse ----
-if st.button("Analyser le portefeuille"):
-    portfolio = get_portfolio_from_evm(address)
+    cash_pct = st.slider("Cash / Stablecoins", 0.0, 1.0, DEFAULT_STRATEGY["cash"], 0.05)
+    lending_pct = st.slider("Lending", 0.0, 1.0, DEFAULT_STRATEGY["lending"], 0.05)
+    lp_pct = st.slider("Liquidity Pool", 0.0, 1.0, DEFAULT_STRATEGY["liquidity_pool"], 0.05)
 
-    if portfolio is None:
-        st.error("Adresse EVM invalide")
+    threshold = st.slider(
+        "Seuil de rééquilibrage",
+        0.01,
+        0.20,
+        DEFAULT_STRATEGY["rebalance_threshold"],
+        0.01
+    )
+
+    total_alloc = cash_pct + lending_pct + lp_pct
+
+    if abs(total_alloc - 1.0) > 0.001:
+        st.error("La somme des allocations doit être égale à 100 %")
         st.stop()
 
-    current_pct = normalize_portfolio(portfolio)
-    actions = detect_actions(strategy, current_pct)
+    strategy = {
+        "cash": cash_pct,
+        "lending": lending_pct,
+        "liquidity_pool": lp_pct,
+        "rebalance_threshold": threshold
+    }
 
-    st.markdown("### Portefeuille détecté (en %)")
+    analyze = st.button("Analyser le bundle")
 
-    st.table({
-        "Actif": ["Cash", "Lending", "Liquidity Pool"],
-        "Actuel": [
-            f"{current_pct['cash']:.1%}",
-            f"{current_pct['lending']:.1%}",
-            f"{current_pct['liquidity_pool']:.1%}",
-        ],
-        "Cible": [
-            f"{strategy['cash']:.1%}",
-            f"{strategy['lending']:.1%}",
-            f"{strategy['liquidity_pool']:.1%}",
-        ],
-    })
+# =======================
+# COLONNE DROITE — RESULTATS
+# =======================
 
-    st.markdown("### Actions recommandées")
+with right:
+    if analyze:
+        if not addresses:
+            st.error("Aucune adresse fournie")
+            st.stop()
 
-    if not actions:
-        st.success("Le portefeuille est aligné avec la stratégie")
-    else:
-        for action in actions:
-            st.warning(action)
+        # ---- Lecture par adresse ----
+        portfolios = []
+        per_address_results = []
 
-    st.caption("Aucune transaction n’est exécutée. Lecture seule.")
+        for addr in addresses:
+            p = get_portfolio_from_evm(addr)
+            if p is None:
+                continue
+
+            portfolios.append(p)
+
+            pct = normalize_portfolio(p)
+            actions = detect_actions(strategy, pct)
+
+            per_address_results.append({
+                "address": addr,
+                "portfolio": p,
+                "pct": pct,
+                "actions": actions
+            })
+
+        if not portfolios:
+            st.error("Aucune adresse valide")
+            st.stop()
+
+        # ---- Agrégation bundle ----
+        bundle = aggregate_portfolios(portfolios)
+        bundle_pct = normalize_portfolio(bundle)
+        bundle_actions = detect_actions(strategy, bundle_pct)
+
+        # =======================
+        # RESULTATS BUNDLE
+        # =======================
+
+        st.subheader("Résultat global (Bundle)")
+
+        st.write(f"Nombre d’adresses : {len(per_address_results)}")
+        st.write(f"Valeur totale : ${bundle['total_usd']:,.0f}")
+
+        st.table({
+            "Actif": ["Cash", "Lending", "Liquidity Pool"],
+            "Actuel": [
+                f"{bundle_pct['cash']:.1%}",
+                f"{bundle_pct['lending']:.1%}",
+                f"{bundle_pct['liquidity_pool']:.1%}",
+            ],
+            "Cible": [
+                f"{strategy['cash']:.1%}",
+                f"{strategy['lending']:.1%}",
+                f"{strategy['liquidity_pool']:.1%}",
+            ],
+        })
+
+        st.markdown("### Actions recommandées (Bundle)")
+
+        if not bundle_actions:
+            st.success("Le bundle est aligné avec la stratégie")
+        else:
+            for a in bundle_actions:
+                st.warning(a)
+
+        st.divider()
+
+        # =======================
+        # RESULTATS PAR ADRESSE
+        # =======================
+
+        st.subheader("Actions par adresse")
+
+        for r in per_address_results:
+            with st.expander(r["address"]):
+                st.write(f"Valeur totale : ${r['portfolio']['total_usd']:,.0f}")
+
+                st.table({
+                    "Actif": ["Cash", "Lending", "Liquidity Pool"],
+                    "Actuel": [
+                        f"{r['pct']['cash']:.1%}",
+                        f"{r['pct']['lending']:.1%}",
+                        f"{r['pct']['liquidity_pool']:.1%}",
+                    ],
+                    "Cible": [
+                        f"{strategy['cash']:.1%}",
+                        f"{strategy['lending']:.1%}",
+                        f"{strategy['liquidity_pool']:.1%}",
+                    ],
+                })
+
+                if not r["actions"]:
+                    st.success("Adresse alignée avec la stratégie")
+                else:
+                    for act in r["actions"]:
+                        st.warning(act)
+
+        st.caption("Aucune transaction n’est exécutée • Lecture seule")

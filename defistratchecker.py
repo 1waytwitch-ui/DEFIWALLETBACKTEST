@@ -1,10 +1,6 @@
 import streamlit as st
 import requests
-import numpy as np
 import datetime
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-import plotly.express as px
 import yfinance as yf
 import math
 

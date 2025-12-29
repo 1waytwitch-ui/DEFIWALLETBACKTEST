@@ -155,17 +155,17 @@ Ces informations <b>ne constituent pas un conseil financier</b>.
 STRATEGIES = {
     "SAFE": {
         "description": "Préservation du capital",
-        "targets": {"hodl": 0.45, "lending": 0.45, "liquidity_pool": 0.10, "borrowing": 0.00},
+        "targets": {"hodl": 0.10, "lending": 0.60, "liquidity_pool": 0.10, "borrowing": 0.20},
         "threshold": 0.05
     },
     "MID": {
-        "description": "Rendement équilibré, levier modéré",
-        "targets": {"hodl": 0.20, "lending": 0.45, "liquidity_pool": 0.25, "borrowing": 0.10},
+        "description": "Rendement équilibré",
+        "targets": {"hodl": 0.05, "lending": 0.50, "liquidity_pool": 0.20, "borrowing": 0.25},
         "threshold": 0.05
     },
     "DEGEN": {
-        "description": "Rendement agressif, levier élevé",
-        "targets": {"hodl": 0.05, "lending": 0.35, "liquidity_pool": 0.40, "borrowing": 0.20},
+        "description": "Rendement agressif et risque très élevès",
+        "targets": {"hodl": 0.10, "lending": 0.30, "liquidity_pool": 0.40, "borrowing": 0.20},
         "threshold": 0.10
     }
 }

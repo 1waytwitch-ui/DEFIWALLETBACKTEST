@@ -156,7 +156,7 @@ if st.session_state.show_disclaimer:
     <br><br>
 
     <b>🔐 Confidentialité & données</b><br>
-    Les valeurs du wallet saisie par l’utilisateur sont traitées et stockées
+    Les valeurs du wallet saisies par l’utilisateur sont traitées et stockées
     <b>uniquement en local dans le navigateur</b> pendant la session.
     Aucune donnée personnelle, adresse de wallet ou information sensible
     n’est enregistrée, transmise ou exploitée sur un serveur externe.

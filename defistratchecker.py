@@ -145,8 +145,20 @@ if st.session_state.show_disclaimer:
         font-size: 15px;
     ">
     <b>⚠️ DISCLAIMER IMPORTANT</b><br><br>
-    Cet outil est réservé aux membres de la Team Élite KBOUR Crypto.
-    Il ne constitue en aucun cas un conseil en investissement.
+    L’accès au backtest est exclusivement réservé aux membres de la Team Élite de la chaîne KBOUR Crypto.
+    Le code d’accès est disponible dans le canal privé <b>« DEFI Académie »</b>.
+    <br><br>
+
+    <b>🔐 Confidentialité & données</b><br>
+    L’adresse du wallet saisie par l’utilisateur est traitée et stockée <b>uniquement en local dans le navigateur</b> pendant la session.
+    Aucune donnée personnelle, adresse de wallet ou information sensible n’est enregistrée, transmise ou exploitée sur un serveur externe.<br><br>
+
+    <b>Nature de l’analyse</b><br>
+    L’analyse du wallet est <b>purement statistique et indicative</b>, réalisée exclusivement en fonction du
+    <b>profil de risque sélectionné (SAFE / MID / DEGEN)</b>.
+    Les résultats affichés ne tiennent pas compte de la situation personnelle de l’utilisateur,
+    des conditions de marché en temps réel ou de paramètres externes, et
+    <b>ne constituent en aucun cas un conseil financier ou une recommandation d’investissement</b>.
     </div>
     """, unsafe_allow_html=True)
 
@@ -293,4 +305,4 @@ with right:
             st.success("Portefeuille aligné avec la stratégie")
         st.markdown('</div>', unsafe_allow_html=True)
 
-st.markdown('<div style="text-align:center;opacity:0.5;margin-top:30px;">© KBOUR Crypto • LP Backtest</div>', unsafe_allow_html=True)
+

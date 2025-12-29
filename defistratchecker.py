@@ -259,7 +259,7 @@ STRATEGIES = {
         "threshold": 0.05
     },
     "DEGEN": {
-        "description": "Rendement agressif et risque très élevès",
+        "description": "Rendement agressif et risques très élevès",
         "targets": {"hodl": 0.05, "lending": 0.25, "liquidity_pool": 0.50, "borrowing": 0.20},
         "threshold": 0.10
     }

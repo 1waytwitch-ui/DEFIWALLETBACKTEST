@@ -22,46 +22,48 @@ html, body, [class*="css"] {
 }
 
 .stApp {
-    background: linear-gradient(135deg, #0b1026, #2b1464);
-    color: #ffffff;
+    background-color: #ffffff;
+    color: #0f172a;
 }
 
-/* ----- Titles ----- */
-h1, h2, h3 {
-    color: #ffffff;
-    font-weight: 700;
-}
-
-h1 {
+/* ----- Gradient Title ----- */
+.gradient-title {
+    font-size: 2.6rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     letter-spacing: 1px;
+    margin-bottom: 0.2em;
 }
 
 /* ----- Cards ----- */
 .card {
-    background: linear-gradient(135deg, #10183d, #3a1c71);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0px 10px 30px rgba(0,0,0,0.35);
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 26px;
+    box-shadow: 0px 10px 30px rgba(15, 23, 42, 0.12);
     margin-bottom: 20px;
+    border: 1px solid #e5e7eb;
 }
 
 /* ----- Inputs ----- */
 .stTextInput input {
-    background-color: #0f1533;
-    color: white;
+    background-color: #ffffff;
+    color: #0f172a;
     border-radius: 10px;
-    border: 1px solid #3c2c77;
+    border: 1px solid #d1d5db;
 }
 
 /* ----- Radio buttons ----- */
 div[role="radiogroup"] {
-    background: #0f1533;
+    background: #f8fafc;
     padding: 12px;
     border-radius: 14px;
-    border: 1px solid #3c2c77;
+    border: 1px solid #e5e7eb;
 }
 
-/* ----- Buttons ----- */
+/* ----- Buttons (KEEP GOLD GRADIENT) ----- */
 .stButton button {
     background: linear-gradient(135deg, #facc15, #f59e0b);
     color: #000000;
@@ -78,35 +80,32 @@ div[role="radiogroup"] {
     box-shadow: 0px 10px 30px rgba(250,204,21,0.5);
 }
 
-/* ----- Info / Success / Warning ----- */
+/* ----- Alerts ----- */
 .stAlert {
     border-radius: 14px;
 }
 
-.stAlert[data-baseweb="notification"] {
-    background-color: #10183d;
-}
-
 /* ----- Table ----- */
 table {
-    background-color: #0f1533 !important;
+    background-color: #ffffff !important;
     border-radius: 14px;
     overflow: hidden;
+    border: 1px solid #e5e7eb;
 }
 
 thead tr th {
-    background-color: #1e2a6d !important;
-    color: #ffffff !important;
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
 }
 
 tbody tr td {
-    color: #ffffff !important;
+    color: #0f172a !important;
 }
 
 /* ----- Footer ----- */
 .footer {
     text-align: center;
-    opacity: 0.6;
+    opacity: 0.5;
     margin-top: 30px;
     font-size: 0.85rem;
 }
@@ -209,7 +208,7 @@ def detect_actions(strategy, current):
 # UI
 # =======================
 
-st.title("LP STRATEGIES • DeFi Strategy Analyzer")
+st.markdown('<div class="gradient-title">LP STRATEGIES • DeFi Strategy Analyzer</div>', unsafe_allow_html=True)
 st.caption("Lecture seule • SAFE / MID / DEGEN")
 
 left, right = st.columns([1, 2])

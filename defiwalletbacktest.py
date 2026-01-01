@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import pandas as pd
 
 # =======================
 # CONFIG
@@ -321,3 +322,218 @@ with right:
         else:
             st.success("Portefeuille aligné avec la stratégie")
         st.markdown('</div>', unsafe_allow_html=True)
+
+# ======================================================
+# BUSINESS PLAN, CASHFLOW & WALLET SCORING MODULE
+# ======================================================
+
+st.markdown("## Module Business Plan, Cashflow et Scoring du Wallet")
+
+st.markdown("""
+<div class="card">
+Objectif : structurer un trésor crypto long terme, estimer le cashflow
+et attribuer un score global au wallet en fonction du risque,
+de la diversification et de la cohérence stratégique.
+</div>
+""", unsafe_allow_html=True)
+
+# -----------------------
+# OBJECTIFS STRATEGIQUES
+# -----------------------
+st.markdown("### Objectifs stratégiques")
+
+OBJECTIVES = [
+    "Accumulation long terme BTC et ETH",
+    "Génération de cashflow DeFi récurrent",
+    "Contrôle strict du risque et du LTV",
+    "Réinvestissement discipliné en phase bull",
+    "Alignement avec le profil SAFE / MID / DEGEN"
+]
+
+for obj in OBJECTIVES:
+    st.markdown(f"- {obj}")
+
+# -----------------------
+# TREASURY OVERVIEW
+# -----------------------
+st.markdown("### Treasury global")
+
+treasury_df = pd.DataFrame({
+    "Asset": ["BTC", "ETH", "Stablecoins", "Autres"],
+    "Valeur ($)": [
+        st.number_input("BTC Treasury ($)", 0.0, step=500.0),
+        st.number_input("ETH Treasury ($)", 0.0, step=500.0),
+        st.number_input("Stablecoins ($)", 0.0, step=500.0),
+        st.number_input("Autres actifs ($)", 0.0, step=500.0),
+    ]
+})
+
+total_treasury = treasury_df["Valeur ($)"].sum()
+
+st.metric("Valeur totale du Treasury", f"${total_treasury:,.0f}")
+st.table(treasury_df)
+
+# -----------------------
+# DEFI STRATEGIES
+# -----------------------
+st.markdown("### Strategies DeFi utilisees")
+
+DEFI_STRATEGIES = [
+    {
+        "name": "Lending conservateur",
+        "risk": "SAFE",
+        "apr": 4
+    },
+    {
+        "name": "Delta neutral",
+        "risk": "MID",
+        "apr": 7
+    },
+    {
+        "name": "Liquidity pools",
+        "risk": "MID",
+        "apr": 10
+    },
+    {
+        "name": "Leverage controle",
+        "risk": "DEGEN",
+        "apr": 18
+    }
+]
+
+for strat in DEFI_STRATEGIES:
+    st.markdown(f"""
+    <div class="card">
+    <b>{strat["name"]}</b><br>
+    Profil : {strat["risk"]}<br>
+    APR estime : {strat["apr"]} %
+    </div>
+    """, unsafe_allow_html=True)
+
+# -----------------------
+# CASHFLOW ESTIMATION
+# -----------------------
+st.markdown("### Estimation du cashflow")
+
+avg_apr = st.slider("APR moyen estime (%)", 0.0, 30.0, 8.0, step=0.5)
+
+monthly_cashflow = total_treasury * (avg_apr / 100) / 12
+yearly_cashflow = total_treasury * (avg_apr / 100)
+
+col1, col2 = st.columns(2)
+col1.metric("Cashflow mensuel estime", f"${monthly_cashflow:,.0f}")
+col2.metric("Cashflow annuel estime", f"${yearly_cashflow:,.0f}")
+
+# -----------------------
+# RISK CONTROL
+# -----------------------
+st.markdown("### Controle du risque")
+
+ltv = st.slider("LTV global (%)", 0, 80, 30)
+
+if ltv < 35:
+    st.success("LTV sain")
+elif ltv < 50:
+    st.warning("LTV modere")
+else:
+    st.error("LTV eleve - risque de liquidation")
+
+# -----------------------
+# WALLET SCORING SYSTEM
+# -----------------------
+st.markdown("### Scoring global du wallet")
+
+score = 0
+
+# Taille du treasury
+if total_treasury >= 100000:
+    score += 25
+elif total_treasury >= 50000:
+    score += 18
+elif total_treasury >= 20000:
+    score += 12
+else:
+    score += 6
+
+# Diversification
+non_zero_assets = treasury_df[treasury_df["Valeur ($)"] > 0].shape[0]
+if non_zero_assets >= 4:
+    score += 20
+elif non_zero_assets == 3:
+    score += 15
+elif non_zero_assets == 2:
+    score += 10
+else:
+    score += 5
+
+# Stablecoin buffer
+stable_ratio = (
+    treasury_df.loc[treasury_df["Asset"] == "Stablecoins", "Valeur ($)"].values[0]
+    / total_treasury if total_treasury > 0 else 0
+)
+
+if 0.15 <= stable_ratio <= 0.35:
+    score += 20
+elif stable_ratio > 0:
+    score += 10
+else:
+    score += 0
+
+# LTV
+if ltv < 35:
+    score += 20
+elif ltv < 50:
+    score += 10
+else:
+    score += 0
+
+# Cohérence avec profil sélectionné
+if strategy_choice == "SAFE" and ltv < 35:
+    score += 15
+elif strategy_choice == "MID" and ltv < 50:
+    score += 15
+elif strategy_choice == "DEGEN":
+    score += 10
+
+# Score final
+st.metric("Score du wallet", f"{score} / 100")
+
+if score >= 80:
+    st.success("Wallet tres solide et bien structure")
+elif score >= 60:
+    st.warning("Wallet correct mais optimisable")
+else:
+    st.error("Wallet fragile ou trop risque")
+
+# -----------------------
+# ACTION PLAN
+# -----------------------
+st.markdown("### Plan d'action recommande")
+
+actions = []
+
+if stable_ratio < 0.15:
+    actions.append("Augmenter le buffer en stablecoins")
+if ltv > 45:
+    actions.append("Reduire le leverage")
+if monthly_cashflow < 500:
+    actions.append("Augmenter l'exposition aux strategies SAFE")
+if total_treasury < 50000:
+    actions.append("Priorite a l'accumulation long terme")
+
+if actions:
+    for a in actions:
+        st.info(a)
+else:
+    st.success("Aucune action critique requise")
+
+# -----------------------
+# FOOTER
+# -----------------------
+st.markdown("""
+<div style="text-align:center; font-size:13px; color:#6b7280; margin-top:40px;">
+Module Business Plan et Scoring Wallet
+<br>
+Analyse locale uniquement - aucune donnee stockee
+</div>
+""", unsafe_allow_html=True)

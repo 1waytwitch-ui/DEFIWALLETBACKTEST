@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import plotly.graph_objects as go
 
 # =======================
 # CONFIG
@@ -271,13 +272,13 @@ def normalize(portfolio):
     total = sum(portfolio[a] for a in ASSETS)
     return {a: portfolio[a]/total if total > 0 else 0 for a in ASSETS}
 
-def detect_actions(strategy, current):
+def detect_actions(strategy_targets, current, threshold):
     actions = []
     for asset in ASSETS:
-        delta = current[asset] - strategy["targets"][asset]
-        if delta > strategy["threshold"]:
+        delta = current[asset] - strategy_targets[asset]
+        if delta > threshold:
             actions.append(f"REDUIRE {asset.upper()} de {delta:.1%}")
-        elif delta < -strategy["threshold"]:
+        elif delta < -threshold:
             actions.append(f"AUGMENTER {asset.upper()} de {-delta:.1%}")
     return actions
 
@@ -293,7 +294,20 @@ with left:
     portfolio = {}
     for asset in ASSETS:
         portfolio[asset] = st.number_input(asset.upper(), min_value=0.0, value=0.0, step=100.0, format="%.2f")
-    strategy_choice = st.radio("Profil de risque", list(STRATEGIES.keys()), horizontal=True)
+
+    st.subheader("Répartition SAFE / MID / DEGEN (%)")
+    safe_pct = st.slider("SAFE", 0, 100, 60)
+    mid_pct = st.slider("MID", 0, 100, 30)
+    degen_pct = st.slider("DEGEN", 0, 100, 10)
+
+    # Normalisation pour que le total fasse 100%
+    total_pct = safe_pct + mid_pct + degen_pct
+    if total_pct > 0:
+        safe_pct /= total_pct
+        mid_pct /= total_pct
+        degen_pct /= total_pct
+
+    strategy_choice = st.radio("Profil de risque (option unique)", list(STRATEGIES.keys()), horizontal=True)
     strategy = STRATEGIES[strategy_choice]
     st.info(strategy["description"])
     analyze = st.button("Analyser")
@@ -301,18 +315,45 @@ with left:
 
 with right:
     if analyze:
+        # Calcul portefeuille composite
+        composite_targets = {}
+        for asset in ASSETS:
+            composite_targets[asset] = (
+                STRATEGIES["SAFE"]["targets"][asset]*safe_pct +
+                STRATEGIES["MID"]["targets"][asset]*mid_pct +
+                STRATEGIES["DEGEN"]["targets"][asset]*degen_pct
+            )
         current = normalize(portfolio)
-        actions = detect_actions(strategy, current)
+
+        threshold = (STRATEGIES["SAFE"]["threshold"]*safe_pct +
+                     STRATEGIES["MID"]["threshold"]*mid_pct +
+                     STRATEGIES["DEGEN"]["threshold"]*degen_pct)
+
+        actions = detect_actions(composite_targets, current, threshold)
 
         st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("Répartition du portefeuille")
+        st.subheader("Répartition du portefeuille composite")
         total_exposure = sum(portfolio[a] for a in ASSETS)
         st.write(f"Exposition totale : ${total_exposure:,.2f}")
         st.table({
             "Catégorie": [a.upper() for a in ASSETS],
             "Actuel": [f"{current[a]:.1%}" for a in ASSETS],
-            "Cible": [f"{strategy['targets'][a]:.1%}" for a in ASSETS]
+            "Cible": [f"{composite_targets[a]:.1%}" for a in ASSETS]
         })
+
+        st.subheader("Répartition SAFE / MID / DEGEN")
+        fig_pie = go.Figure(data=[go.Pie(
+            labels=["SAFE", "MID", "DEGEN"],
+            values=[safe_pct, mid_pct, degen_pct],
+            hole=0.4,
+            marker=dict(colors=["#10b981", "#f59e0b", "#ef4444"]),
+            textinfo="label+percent"
+        )])
+        st.plotly_chart(fig_pie, use_container_width=True)
+
+        st.subheader("Répartition par type d'actif")
+        for asset in ASSETS:
+            st.progress(int(composite_targets[asset]*100), text=asset.upper())
 
         st.subheader("Actions recommandées")
         if actions:

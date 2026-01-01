@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-import plotly.graph_objects as go
 
 # =======================
 # CONFIG
@@ -62,21 +61,20 @@ h1, h2, h3, h4 {
     border: 1px solid #e5e7eb;
 }
 
-/* Tables */
-table {
-    background-color: #ffffff !important;
-    border-radius: 14px;
-    overflow: hidden;
-    border: 1px solid #e5e7eb;
+/* Titles overlay like header */
+.section-title {
+    background: linear-gradient(135deg, #0a0f1f 0%, #1e2761 40%, #4b1c7d 100%);
+    padding: 12px 18px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    margin-bottom: 15px;
+    font-size: 20px;
 }
 
-thead tr th {
-    background-color: #f1f5f9 !important;
-    color: #0f172a !important;
-}
-
-tbody tr td {
-    color: #0f172a !important;
+/* Progress Bars */
+.stProgress .st-bo {
+    border-radius: 10px;
 }
 
 </style>
@@ -87,49 +85,18 @@ tbody tr td {
 # =======================
 
 st.markdown("""
-<style>
-.deFi-banner {
+<div style="
     background: linear-gradient(135deg, #0a0f1f 0%, #1e2761 40%, #4b1c7d 100%);
     padding: 25px 30px;
     border-radius: 18px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0px 4px 18px rgba(0,0,0,0.45);
-    margin-bottom: 25px;
-}
-
-.deFi-title-text {
+    justify-content: center;
+    color: white;
     font-size: 36px;
     font-weight: 700;
-    color: white !important;
-}
-
-.deFi-buttons a {
-    color: white;
-    font-size: 15px;
-    font-weight: 600;
-    text-decoration: none;
-    padding: 8px 14px;
-    border-radius: 12px;
-    margin-left: 8px;
-}
-
-.krystal-btn { background-color: #06b6d4; }
-.plusvalue-btn { background-color: #10b981; }
-.telegram-btn { background-color: #6c5ce7; }
-.formation-btn { background-color: #f59e0b; }
-</style>
-
-<div class="deFi-banner">
-    <div class="deFi-title-text">DEFI WALLET BACKTEST</div>
-    <div class="deFi-buttons">
-        <a href="https://defi.krystal.app/referral?r=3JwR8YRQCRJT" target="_blank" class="krystal-btn">Krystal</a>
-        <a href="https://plusvalueimposable.streamlit.app/" target="_blank" class="plusvalue-btn">Plus-value</a>
-        <a href="https://t.me/Pigeonchanceux" target="_blank" class="telegram-btn">Telegram</a>
-        <a href="https://shorturl.at/X3sYt" target="_blank" class="formation-btn">Formation</a>
-    </div>
+    margin-bottom: 25px;
+">
+DEFI WALLET BACKTEST
 </div>
 """, unsafe_allow_html=True)
 
@@ -186,8 +153,7 @@ if "authenticated" not in st.session_state:
 if not st.session_state.authenticated:
 
     st.markdown("""
-    <style>
-    .login-card {
+    <div style="
         background: linear-gradient(135deg, #0a0f1f 0%, #1e2761 40%, #4b1c7d 100%);
         padding: 28px 30px;
         border-radius: 18px;
@@ -196,39 +162,11 @@ if not st.session_state.authenticated:
         border: 1px solid rgba(255,255,255,0.12);
         box-shadow: 0px 4px 18px rgba(0,0,0,0.45);
         text-align: center;
-    }
-
-    .login-title {
-        font-size: 28px;
-        font-weight: 700;
         color: white;
-    }
-
-    .login-subtitle {
-        font-size: 14px;
-        color: #d1d5db;
-        margin-bottom: 18px;
-    }
-    </style>
-
-    <div class="login-card">
-        <div class="login-title">Accès sécurisé</div>
-        <div class="login-subtitle">
-            Réservé aux membres de la <b>Team Élite</b><br>
-            Code disponible dans <b>DEFI Académie</b>
-        </div>
-        <a href="https://www.youtube.com/channel/UCZL_vS9bsLI4maA4Oja9zyg/join"
-           target="_blank"
-           style="
-            background:#facc15;
-            color:#111827;
-            padding:10px 18px;
-            border-radius:14px;
-            font-weight:700;
-            display:inline-block;
-           ">
-           Rejoindre la Team Élite
-        </a>
+        font-weight: 700;
+        font-size: 28px;
+    ">
+    Accès sécurisé - Team Élite
     </div>
     """, unsafe_allow_html=True)
 
@@ -272,10 +210,10 @@ def normalize(portfolio):
     total = sum(portfolio[a] for a in ASSETS)
     return {a: portfolio[a]/total if total > 0 else 0 for a in ASSETS}
 
-def detect_actions(strategy_targets, current, threshold):
+def detect_actions(composite_targets, current, threshold):
     actions = []
     for asset in ASSETS:
-        delta = current[asset] - strategy_targets[asset]
+        delta = current[asset] - composite_targets[asset]
         if delta > threshold:
             actions.append(f"REDUIRE {asset.upper()} de {delta:.1%}")
         elif delta < -threshold:
@@ -283,39 +221,35 @@ def detect_actions(strategy_targets, current, threshold):
     return actions
 
 # =======================
-# UI MANUEL
+# UI PRINCIPAL
 # =======================
 
 left, right = st.columns([1,2])
 
 with left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.subheader("Valeurs du wallet ($)")
+    st.markdown('<div class="section-title">Valeurs du wallet</div>', unsafe_allow_html=True)
     portfolio = {}
     for asset in ASSETS:
         portfolio[asset] = st.number_input(asset.upper(), min_value=0.0, value=0.0, step=100.0, format="%.2f")
 
-    st.subheader("Répartition SAFE / MID / DEGEN (%)")
+    st.markdown('<div class="section-title">Répartition SAFE / MID / DEGEN</div>', unsafe_allow_html=True)
     safe_pct = st.slider("SAFE", 0, 100, 60)
     mid_pct = st.slider("MID", 0, 100, 30)
     degen_pct = st.slider("DEGEN", 0, 100, 10)
 
-    # Normalisation pour que le total fasse 100%
     total_pct = safe_pct + mid_pct + degen_pct
     if total_pct > 0:
         safe_pct /= total_pct
         mid_pct /= total_pct
         degen_pct /= total_pct
 
-    strategy_choice = st.radio("Profil de risque (option unique)", list(STRATEGIES.keys()), horizontal=True)
-    strategy = STRATEGIES[strategy_choice]
-    st.info(strategy["description"])
     analyze = st.button("Analyser")
     st.markdown('</div>', unsafe_allow_html=True)
 
 with right:
     if analyze:
-        # Calcul portefeuille composite
+        # Calcul portefeuille par stratégie
         composite_targets = {}
         for asset in ASSETS:
             composite_targets[asset] = (
@@ -323,16 +257,16 @@ with right:
                 STRATEGIES["MID"]["targets"][asset]*mid_pct +
                 STRATEGIES["DEGEN"]["targets"][asset]*degen_pct
             )
-        current = normalize(portfolio)
 
+        current = normalize(portfolio)
         threshold = (STRATEGIES["SAFE"]["threshold"]*safe_pct +
                      STRATEGIES["MID"]["threshold"]*mid_pct +
                      STRATEGIES["DEGEN"]["threshold"]*degen_pct)
-
         actions = detect_actions(composite_targets, current, threshold)
 
         st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.subheader("Répartition du portefeuille composite")
+
+        st.markdown('<div class="section-title">Répartition du portefeuille</div>', unsafe_allow_html=True)
         total_exposure = sum(portfolio[a] for a in ASSETS)
         st.write(f"Exposition totale : ${total_exposure:,.2f}")
         st.table({
@@ -341,24 +275,20 @@ with right:
             "Cible": [f"{composite_targets[a]:.1%}" for a in ASSETS]
         })
 
-        st.subheader("Répartition SAFE / MID / DEGEN")
-        fig_pie = go.Figure(data=[go.Pie(
-            labels=["SAFE", "MID", "DEGEN"],
-            values=[safe_pct, mid_pct, degen_pct],
-            hole=0.4,
-            marker=dict(colors=["#10b981", "#f59e0b", "#ef4444"]),
-            textinfo="label+percent"
-        )])
-        st.plotly_chart(fig_pie, use_container_width=True)
+        st.markdown('<div class="section-title">Répartition par stratégie</div>', unsafe_allow_html=True)
+        st.progress(int(safe_pct*100), text="SAFE")
+        st.progress(int(mid_pct*100), text="MID")
+        st.progress(int(degen_pct*100), text="DEGEN")
 
-        st.subheader("Répartition par type d'actif")
+        st.markdown('<div class="section-title">Répartition par type d\'actif</div>', unsafe_allow_html=True)
         for asset in ASSETS:
             st.progress(int(composite_targets[asset]*100), text=asset.upper())
 
-        st.subheader("Actions recommandées")
+        st.markdown('<div class="section-title">Actions recommandées</div>', unsafe_allow_html=True)
         if actions:
             for a in actions:
                 st.warning(a)
         else:
             st.success("Portefeuille aligné avec la stratégie")
+
         st.markdown('</div>', unsafe_allow_html=True)

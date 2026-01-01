@@ -72,10 +72,23 @@ h1, h2, h3, h4 {
     font-size: 20px;
 }
 
-/* Progress Bars */
-.stProgress .st-bo {
-    border-radius: 10px;
+.gauge-container {
+    width: 100%;
+    height: 25px;
+    background: #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    display: flex;
 }
+
+.gauge-segment {
+    height: 100%;
+}
+
+.safe { background-color: #16a34a; }
+.mid { background-color: #f97316; }
+.degen { background-color: #dc2626; }
 
 </style>
 """, unsafe_allow_html=True)
@@ -339,23 +352,11 @@ with right:
                      STRATEGIES["DEGEN"]["threshold"]*degen_pct)
         actions = detect_actions(composite_targets, current, threshold)
 
-        # Calcul profil dominant
-        profile_scores = {}
-        for key, strat in STRATEGIES.items():
-            score = 0
-            for asset in ASSETS:
-                score += min(current[asset], strat["targets"][asset])
-            profile_scores[key] = score
-
-        dominant_profile = max(profile_scores, key=profile_scores.get)
-        color_map = {"SAFE": "green", "MID": "orange", "DEGEN": "red"}
-        gauge_color = color_map[dominant_profile]
-
         st.markdown('<div class="card">', unsafe_allow_html=True)
 
         st.markdown('<div class="section-title">Répartition du portefeuille</div>', unsafe_allow_html=True)
         total_exposure = sum(portfolio[a] for a in ASSETS)
-        st.write(f"Exposition totale : ${total_exposure:,.2f} ({dominant_profile})")
+        st.write(f"Exposition totale : ${total_exposure:,.2f}")
         st.table({
             "Catégorie": [a.upper() for a in ASSETS],
             "Actuel": [f"{current[a]:.1%}" for a in ASSETS],
@@ -368,10 +369,19 @@ with right:
         })
 
         # =======================
-        # Répartition du profil de risque avec une seule jauge
+        # Répartition du profil de risque avec jauge 3 segments
         # =======================
         st.markdown('<div class="section-title">Répartition du profil de risque</div>', unsafe_allow_html=True)
-        st.progress(int(profile_scores[dominant_profile]*100), text=f"{dominant_profile} - {gauge_color.upper()}")
+        st.markdown(f"""
+        <div class="gauge-container">
+            <div class="gauge-segment safe" style="width:{safe_pct*100}%"></div>
+            <div class="gauge-segment mid" style="width:{mid_pct*100}%"></div>
+            <div class="gauge-segment degen" style="width:{degen_pct*100}%"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-weight:700;">
+            <span>SAFE</span><span>MID</span><span>DEGEN</span>
+        </div>
+        """, unsafe_allow_html=True)
 
         st.markdown('<div class="section-title">Répartition par stratégie</div>', unsafe_allow_html=True)
         for asset in ASSETS:

@@ -314,9 +314,9 @@ with left:
         portfolio[asset] = st.number_input(asset.upper(), min_value=0.0, value=0.0, step=100.0, format="%.2f")
 
     st.markdown('<div class="section-title">Répartition SAFE / MID / DEGEN</div>', unsafe_allow_html=True)
-    safe_pct = st.slider("SAFE", 0, 100, 60)
-    mid_pct = st.slider("MID", 0, 100, 30)
-    degen_pct = st.slider("DEGEN", 0, 100, 10)
+    safe_pct = st.slider("SAFE", 0, 100, 40)
+    mid_pct = st.slider("MID", 0, 100, 60)
+    degen_pct = st.slider("DEGEN", 0, 100, 0)
 
     total_pct = safe_pct + mid_pct + degen_pct
     if total_pct > 0:
@@ -361,7 +361,7 @@ with right:
         st.progress(int(degen_pct*100), text="DEGEN")
         st.write("Incluant BTC natif comme actif principal à accumuler")
 
-        st.markdown('<div class="section-title">Répartition par type d\'actif</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Répartition par stratégie</div>', unsafe_allow_html=True)
         for asset in ASSETS:
             st.progress(int(composite_targets[asset]*100), text=asset.upper())
 

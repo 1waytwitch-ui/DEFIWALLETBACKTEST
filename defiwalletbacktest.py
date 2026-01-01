@@ -339,7 +339,7 @@ with right:
                      STRATEGIES["DEGEN"]["threshold"]*degen_pct)
         actions = detect_actions(composite_targets, current, threshold)
 
-        # Calcul part de SAFE/MID/DEGEN réel selon wallet
+        # Calcul profil dominant
         profile_scores = {}
         for key, strat in STRATEGIES.items():
             score = 0
@@ -347,11 +347,14 @@ with right:
                 score += min(current[asset], strat["targets"][asset])
             profile_scores[key] = score
 
+        dominant_profile = max(profile_scores, key=profile_scores.get)
+        color_map = {"SAFE": "green", "MID": "orange", "DEGEN": "red"}
+        gauge_color = color_map[dominant_profile]
+
         st.markdown('<div class="card">', unsafe_allow_html=True)
 
         st.markdown('<div class="section-title">Répartition du portefeuille</div>', unsafe_allow_html=True)
         total_exposure = sum(portfolio[a] for a in ASSETS)
-        dominant_profile = max(profile_scores, key=profile_scores.get)
         st.write(f"Exposition totale : ${total_exposure:,.2f} ({dominant_profile})")
         st.table({
             "Catégorie": [a.upper() for a in ASSETS],
@@ -364,10 +367,11 @@ with right:
             ]
         })
 
+        # =======================
+        # Répartition du profil de risque avec une seule jauge
+        # =======================
         st.markdown('<div class="section-title">Répartition du profil de risque</div>', unsafe_allow_html=True)
-        st.progress(int(safe_pct*100), text="SAFE")
-        st.progress(int(mid_pct*100), text="MID")
-        st.progress(int(degen_pct*100), text="DEGEN")
+        st.progress(int(profile_scores[dominant_profile]*100), text=f"{dominant_profile} - {gauge_color.upper()}")
 
         st.markdown('<div class="section-title">Répartition par stratégie</div>', unsafe_allow_html=True)
         for asset in ASSETS:

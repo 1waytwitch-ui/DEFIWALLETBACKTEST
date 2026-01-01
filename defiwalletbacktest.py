@@ -355,7 +355,7 @@ with right:
             "Cible": [f"{composite_targets[a]:.1%}" for a in ASSETS]
         })
 
-        st.markdown('<div class="section-title">Répartition par stratégie</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Répartition du profil de risque</div>', unsafe_allow_html=True)
         st.progress(int(safe_pct*100), text="SAFE")
         st.progress(int(mid_pct*100), text="MID")
         st.progress(int(degen_pct*100), text="DEGEN")
@@ -370,6 +370,6 @@ with right:
             for a in actions:
                 st.warning(a)
         else:
-            st.success("Portefeuille aligné avec la stratégie")
+            st.success("Portefeuille aligné avec la stratégie et le profil de risque")
 
         st.markdown('</div>', unsafe_allow_html=True)

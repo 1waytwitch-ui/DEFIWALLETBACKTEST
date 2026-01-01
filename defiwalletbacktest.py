@@ -171,20 +171,18 @@ if st.session_state.show_disclaimer:
     </div>
     """, unsafe_allow_html=True)
 
-# -----------------------
-# CODE SECRET
-# -----------------------
+# =======================
+# AUTHENTIFICATION
+# =======================
+
 SECRET_CODE = "WALLET"
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
 if not st.session_state.authenticated:
-
-    # HTML + CSS overlay + bouton
     st.markdown("""
-    <style>
-    .login-card {
+    <div style="
         background: linear-gradient(135deg, #0a0f1f 0%, #1e2761 40%, #4b1c7d 100%);
         padding: 28px 30px;
         border-radius: 18px;
@@ -193,43 +191,16 @@ if not st.session_state.authenticated:
         border: 1px solid rgba(255,255,255,0.12);
         box-shadow: 0px 4px 18px rgba(0,0,0,0.45);
         text-align: center;
-    }
-    .login-title { font-size: 28px; font-weight: 700; color: white !important; margin-bottom: 6px; }
-    .login-subtitle { font-size: 14px; color: #d1d5db; margin-bottom: 18px; }
-    .elite-btn {
-        display: inline-block;
-        background-color: #facc15;
-        color: #111827 !important;
-        font-size: 16px;
+        color: white;
         font-weight: 700;
-        text-decoration: none !important;
-        padding: 10px 18px;
-        border-radius: 14px;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-        margin-bottom: 18px;
-    }
-    .elite-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(250,204,21,0.4);
-    }
-    </style>
-
-    <div class="login-card">
-        <div class="login-title">Accès sécurisé</div>
-        <div class="login-subtitle">
-            Réservé aux membres de la <b>Team Élite KBOUR Crypto</b><br>
-            Code disponible dans <b>DEFI Académie</b>
-        </div>
-        <!-- BOUTON EXTERNE -->
-        <a href="https://www.youtube.com/channel/UCZL_vS9bsLI4maA4Oja9zyg/join" 
-           target="_blank" class="elite-btn">
-           Rejoindre la Team Élite
-        </a>
+        font-size: 28px;
+    ">
+    Accès sécurisé - Team Élite
     </div>
     """, unsafe_allow_html=True)
 
-    # INPUT STREAMLIT séparé pour que ce soit cliquable
     st.text_input("Code d'accès", key="secret_code", type="password")
+
     if st.button("Valider", use_container_width=True):
         if st.session_state.secret_code == SECRET_CODE:
             st.session_state.authenticated = True
@@ -239,7 +210,6 @@ if not st.session_state.authenticated:
 
     st.stop()
 
-
 # =======================
 # STRATEGIES
 # =======================
@@ -247,17 +217,17 @@ if not st.session_state.authenticated:
 STRATEGIES = {
     "SAFE": {
         "description": "Préservation du capital",
-        "targets": {"hodl": 0.10, "lending": 0.75, "liquidity_pool": 0.10, "borrowing": 0.05},
+        "targets": {"hodl": 0.15, "lending": 0.70, "liquidity_pool": 0.10, "borrowing": 0.05},
         "threshold": 0.05
     },
     "MID": {
         "description": "Rendement équilibré",
-        "targets": {"hodl": 0.05, "lending": 0.55, "liquidity_pool": 0.25, "borrowing": 0.15},
+        "targets": {"hodl": 0.10, "lending": 0.50, "liquidity_pool": 0.25, "borrowing": 0.15},
         "threshold": 0.05
     },
     "DEGEN": {
         "description": "Rendement agressif et risques très élevès",
-        "targets": {"hodl": 0.02, "lending": 0.28, "liquidity_pool": 0.50, "borrowing": 0.20},
+        "targets": {"hodl": 0.05, "lending": 0.25, "liquidity_pool": 0.50, "borrowing": 0.20},
         "threshold": 0.10
     }
 }
@@ -279,7 +249,55 @@ def detect_actions(composite_targets, current, threshold):
     return actions
 
 # =======================
-# UI PRINCIPAL
+# CHECKLIST UTILISATEUR
+# =======================
+
+st.markdown('<div class="card">', unsafe_allow_html=True)
+st.markdown('<div class="section-title">Checklist de sécurité avant utilisation</div>', unsafe_allow_html=True)
+
+checklist_items = [
+    "Wallet BITCOIN sur la blockchain et sécurisé par coldwallet",
+    "Wallet EVM sécurisé par coldwallet",
+    "Je sauvegarde mes clés privées et mes seedphrases de manière sécurisée",
+    "Utilisation DEFI et crypto sur PC dédié",
+    "Utilisation de protocoles reconnus",
+    "Utilisation de blockchain de layer 2 (base, arbitrum, etc.) pour limiter les frais",
+    "Propre recherche faite avant de me lancer et tests effectué avec des petits montants",
+    "Je maitrise les swaps et bridges"
+]
+
+user_check = []
+for item in checklist_items:
+    user_check.append(st.checkbox(item, key=item))
+
+score = sum(user_check)
+st.write(f"Score de sécurité : {score}/{len(checklist_items)}")
+
+# =======================
+# Profil visuel
+# =======================
+if score <= 3:
+    prof_color = "red"
+    prof_text = "Risque élevé"
+elif score <= 5:
+    prof_color = "orange"
+    prof_text = "Risque moyen"
+else:
+    prof_color = "green"
+    prof_text = "Sécurisé"
+
+st.markdown(f"<div style='font-weight:700; color:{prof_color}; font-size:20px'>Profil de sécurité : {prof_text}</div>", unsafe_allow_html=True)
+st.progress(int(score/len(checklist_items)*100))
+
+if score < len(checklist_items):
+    st.warning("⚠️ Veuillez compléter tous les points de la checklist avant d'utiliser l'outil.")
+    st.stop()
+else:
+    st.success("✅ Checklist complète, vous pouvez continuer l'analyse.")
+st.markdown('</div>', unsafe_allow_html=True)
+
+# =======================
+# UI PRINCIPAL (après checklist validée)
 # =======================
 
 left, right = st.columns([1,2])
@@ -291,10 +309,10 @@ with left:
     for asset in ASSETS:
         portfolio[asset] = st.number_input(asset.upper(), min_value=0.0, value=0.0, step=100.0, format="%.2f")
 
-    st.markdown('<div class="section-title">Répartition SAFE / MID / DEGEN</div>', unsafe_allow_html=True)
-    safe_pct = st.slider("SAFE", 0, 100, 40)
-    mid_pct = st.slider("MID", 0, 100, 60)
-    degen_pct = st.slider("DEGEN", 0, 100, 0)
+    st.markdown('<div class="section-title">Répartition du wallet SAFE / MID / DEGEN</div>', unsafe_allow_html=True)
+    safe_pct = st.slider("SAFE", 0, 100, 60)
+    mid_pct = st.slider("MID", 0, 100, 30)
+    degen_pct = st.slider("DEGEN", 0, 100, 10)
 
     total_pct = safe_pct + mid_pct + degen_pct
     if total_pct > 0:
@@ -334,6 +352,11 @@ with right:
         })
 
         st.markdown('<div class="section-title">Répartition par stratégie</div>', unsafe_allow_html=True)
+        st.progress(int(safe_pct*100), text="SAFE")
+        st.progress(int(mid_pct*100), text="MID")
+        st.progress(int(degen_pct*100), text="DEGEN")
+
+        st.markdown('<div class="section-title">Répartition par type d\'actif</div>', unsafe_allow_html=True)
         for asset in ASSETS:
             st.progress(int(composite_targets[asset]*100), text=asset.upper())
 

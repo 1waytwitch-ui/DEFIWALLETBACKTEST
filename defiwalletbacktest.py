@@ -41,7 +41,7 @@ h1, h2, h3, h4 {
     border-radius: 10px;
 }
 
-/* Buttons (CTA GOLD) */
+/* Buttons */
 .stButton button {
     background: linear-gradient(135deg, #facc15, #f59e0b) !important;
     color: #000000 !important;
@@ -79,6 +79,22 @@ tbody tr td {
     color: #0f172a !important;
 }
 
+/* Section titles */
+.section-banner {
+    background: linear-gradient(135deg, #0a0f1f 0%, #1e2761 40%, #4b1c7d 100%);
+    padding: 16px 24px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0px 4px 18px rgba(0,0,0,0.35);
+    margin: 35px 0 20px 0;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: white !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -87,8 +103,7 @@ tbody tr td {
 # =======================
 
 st.markdown("""
-<style>
-.deFi-banner {
+<div class="deFi-banner" style="
     background: linear-gradient(135deg, #0a0f1f 0%, #1e2761 40%, #4b1c7d 100%);
     padding: 25px 30px;
     border-radius: 18px;
@@ -97,152 +112,23 @@ st.markdown("""
     align-items: center;
     border: 1px solid rgba(255,255,255,0.12);
     box-shadow: 0px 4px 18px rgba(0,0,0,0.45);
-    margin-bottom: 25px;
-}
-
-.deFi-title-text {
-    font-size: 36px;
-    font-weight: 700;
-    color: white !important;
-}
-
-.deFi-buttons a {
-    color: white;
-    font-size: 15px;
-    font-weight: 600;
-    text-decoration: none;
-    padding: 8px 14px;
-    border-radius: 12px;
-    margin-left: 8px;
-}
-
-.krystal-btn { background-color: #06b6d4; }
-.plusvalue-btn { background-color: #10b981; }
-.telegram-btn { background-color: #6c5ce7; }
-.formation-btn { background-color: #f59e0b; }
-</style>
-
-<div class="deFi-banner">
-    <div class="deFi-title-text">DEFI WALLET BACKTEST</div>
-    <div class="deFi-buttons">
-        <a href="https://defi.krystal.app/referral?r=3JwR8YRQCRJT" target="_blank" class="krystal-btn">Krystal</a>
-        <a href="https://plusvalueimposable.streamlit.app/" target="_blank" class="plusvalue-btn">Plus-value</a>
-        <a href="https://t.me/Pigeonchanceux" target="_blank" class="telegram-btn">Telegram</a>
-        <a href="https://shorturl.at/X3sYt" target="_blank" class="formation-btn">Formation</a>
+    margin-bottom: 25px;">
+    <div style="font-size:36px;font-weight:700;color:white;">
+        DEFI WALLET BACKTEST
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 # =======================
-# DISCLAIMER
+# SECTION TITLE FUNCTION
 # =======================
 
-if "show_disclaimer" not in st.session_state:
-    st.session_state.show_disclaimer = True
-
-if st.session_state.show_disclaimer:
-    st.markdown("""
-    <div style="
-        background-color: #fff3cd;
-        border-left: 6px solid #ffca2c;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: #000;
-        margin-bottom: 25px;
-        font-size: 15px;
-    ">
-    <b>⚠️ DISCLAIMER IMPORTANT</b><br><br>
-    L’accès au backtest est exclusivement réservé aux membres de la Team Élite de la chaîne KBOUR Crypto.
-    Le code d’accès est disponible dans le canal privé <b>« DEFI Académie »</b>.
-    <br><br>
-
-    <b>🔐 Confidentialité & données</b><br>
-    Les valeurs du wallet saisies par l’utilisateur sont traitées et stockées
-    <b>uniquement en local dans le navigateur</b> pendant la session.
-    Aucune donnée personnelle, adresse de wallet ou information sensible
-    n’est enregistrée, transmise ou exploitée sur un serveur externe.
-    <br><br>
-
-    <b>Nature de l’analyse</b><br>
-    L’analyse du wallet est <b>purement statistique et indicative</b>,
-    réalisée exclusivement en fonction du
-    <b>profil de risque sélectionné (SAFE / MID / DEGEN)</b>.
-    Les résultats affichés ne tiennent pas compte de la situation personnelle
-    de l’utilisateur, des conditions de marché en temps réel ou de paramètres
-    externes, et <b>ne constituent en aucun cas un conseil financier ou une
-    recommandation d’investissement</b>.
+def section_title(title):
+    st.markdown(f"""
+    <div class="section-banner">
+        <div class="section-title">{title}</div>
     </div>
     """, unsafe_allow_html=True)
-
-# =======================
-# AUTHENTIFICATION
-# =======================
-
-SECRET_CODE = "WALLET"
-
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-if not st.session_state.authenticated:
-
-    st.markdown("""
-    <style>
-    .login-card {
-        background: linear-gradient(135deg, #0a0f1f 0%, #1e2761 40%, #4b1c7d 100%);
-        padding: 28px 30px;
-        border-radius: 18px;
-        max-width: 420px;
-        margin: 3rem auto;
-        border: 1px solid rgba(255,255,255,0.12);
-        box-shadow: 0px 4px 18px rgba(0,0,0,0.45);
-        text-align: center;
-    }
-
-    .login-title {
-        font-size: 28px;
-        font-weight: 700;
-        color: white;
-    }
-
-    .login-subtitle {
-        font-size: 14px;
-        color: #d1d5db;
-        margin-bottom: 18px;
-    }
-    </style>
-
-    <div class="login-card">
-        <div class="login-title">Accès sécurisé</div>
-        <div class="login-subtitle">
-            Réservé aux membres de la <b>Team Élite</b><br>
-            Code disponible dans <b>DEFI Académie</b>
-        </div>
-        <a href="https://www.youtube.com/channel/UCZL_vS9bsLI4maA4Oja9zyg/join"
-           target="_blank"
-           style="
-            background:#facc15;
-            color:#111827;
-            padding:10px 18px;
-            border-radius:14px;
-            font-weight:700;
-            display:inline-block;
-           ">
-           Rejoindre la Team Élite
-        </a>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.text_input("Code d'accès", key="secret_code", type="password")
-
-    if st.button("Valider", use_container_width=True):
-        if st.session_state.secret_code == SECRET_CODE:
-            st.session_state.authenticated = True
-            st.rerun()
-        else:
-            st.error("Code incorrect")
-
-    st.stop()
-
 
 # =======================
 # STRATEGIES
@@ -260,7 +146,7 @@ STRATEGIES = {
         "threshold": 0.05
     },
     "DEGEN": {
-        "description": "Rendement agressif et risques très élevès",
+        "description": "Rendement agressif et risques élevés",
         "targets": {"hodl": 0.05, "lending": 0.25, "liquidity_pool": 0.50, "borrowing": 0.20},
         "threshold": 0.10
     }
@@ -283,17 +169,19 @@ def detect_actions(strategy, current):
     return actions
 
 # =======================
-# UI MANUEL
+# WALLET BACKTEST
 # =======================
+
+section_title("Analyse du wallet")
 
 left, right = st.columns([1,2])
 
 with left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.subheader("Valeurs du wallet ($)")
+    st.subheader("Valeurs du wallet")
     portfolio = {}
     for asset in ASSETS:
-        portfolio[asset] = st.number_input(asset.upper(), min_value=0.0, value=0.0, step=100.0, format="%.2f")
+        portfolio[asset] = st.number_input(asset.upper(), 0.0, step=100.0)
     strategy_choice = st.radio("Profil de risque", list(STRATEGIES.keys()), horizontal=True)
     strategy = STRATEGIES[strategy_choice]
     st.info(strategy["description"])
@@ -307,8 +195,6 @@ with right:
 
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.subheader("Répartition du portefeuille")
-        total_exposure = sum(portfolio[a] for a in ASSETS)
-        st.write(f"Exposition totale : ${total_exposure:,.2f}")
         st.table({
             "Catégorie": [a.upper() for a in ASSETS],
             "Actuel": [f"{current[a]:.1%}" for a in ASSETS],
@@ -323,217 +209,33 @@ with right:
             st.success("Portefeuille aligné avec la stratégie")
         st.markdown('</div>', unsafe_allow_html=True)
 
-# ======================================================
-# BUSINESS PLAN, CASHFLOW & WALLET SCORING MODULE
-# ======================================================
+# =======================
+# BUSINESS PLAN & SCORING
+# =======================
 
-st.markdown("## Module Business Plan, Cashflow et Scoring du Wallet")
+section_title("Business plan et scoring du wallet")
 
-st.markdown("""
-<div class="card">
-Objectif : structurer un trésor crypto long terme, estimer le cashflow
-et attribuer un score global au wallet en fonction du risque,
-de la diversification et de la cohérence stratégique.
-</div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="card">', unsafe_allow_html=True)
 
-# -----------------------
-# OBJECTIFS STRATEGIQUES
-# -----------------------
-st.markdown("### Objectifs stratégiques")
+btc = st.number_input("BTC Treasury", 0.0, step=500.0)
+eth = st.number_input("ETH Treasury", 0.0, step=500.0)
+stable = st.number_input("Stablecoins", 0.0, step=500.0)
+other = st.number_input("Autres actifs", 0.0, step=500.0)
 
-OBJECTIVES = [
-    "Accumulation long terme BTC et ETH",
-    "Génération de cashflow DeFi récurrent",
-    "Contrôle strict du risque et du LTV",
-    "Réinvestissement discipliné en phase bull",
-    "Alignement avec le profil SAFE / MID / DEGEN"
-]
+total = btc + eth + stable + other
+st.metric("Valeur totale", f"${total:,.0f}")
 
-for obj in OBJECTIVES:
-    st.markdown(f"- {obj}")
+ltv = st.slider("LTV global", 0, 80, 30)
+apr = st.slider("APR moyen estime", 0.0, 30.0, 8.0)
 
-# -----------------------
-# TREASURY OVERVIEW
-# -----------------------
-st.markdown("### Treasury global")
-
-treasury_df = pd.DataFrame({
-    "Asset": ["BTC", "ETH", "Stablecoins", "Autres"],
-    "Valeur ($)": [
-        st.number_input("BTC Treasury ($)", 0.0, step=500.0),
-        st.number_input("ETH Treasury ($)", 0.0, step=500.0),
-        st.number_input("Stablecoins ($)", 0.0, step=500.0),
-        st.number_input("Autres actifs ($)", 0.0, step=500.0),
-    ]
-})
-
-total_treasury = treasury_df["Valeur ($)"].sum()
-
-st.metric("Valeur totale du Treasury", f"${total_treasury:,.0f}")
-st.table(treasury_df)
-
-# -----------------------
-# DEFI STRATEGIES
-# -----------------------
-st.markdown("### Strategies DeFi utilisees")
-
-DEFI_STRATEGIES = [
-    {
-        "name": "Lending conservateur",
-        "risk": "SAFE",
-        "apr": 4
-    },
-    {
-        "name": "Delta neutral",
-        "risk": "MID",
-        "apr": 7
-    },
-    {
-        "name": "Liquidity pools",
-        "risk": "MID",
-        "apr": 10
-    },
-    {
-        "name": "Leverage controle",
-        "risk": "DEGEN",
-        "apr": 18
-    }
-]
-
-for strat in DEFI_STRATEGIES:
-    st.markdown(f"""
-    <div class="card">
-    <b>{strat["name"]}</b><br>
-    Profil : {strat["risk"]}<br>
-    APR estime : {strat["apr"]} %
-    </div>
-    """, unsafe_allow_html=True)
-
-# -----------------------
-# CASHFLOW ESTIMATION
-# -----------------------
-st.markdown("### Estimation du cashflow")
-
-avg_apr = st.slider("APR moyen estime (%)", 0.0, 30.0, 8.0, step=0.5)
-
-monthly_cashflow = total_treasury * (avg_apr / 100) / 12
-yearly_cashflow = total_treasury * (avg_apr / 100)
-
-col1, col2 = st.columns(2)
-col1.metric("Cashflow mensuel estime", f"${monthly_cashflow:,.0f}")
-col2.metric("Cashflow annuel estime", f"${yearly_cashflow:,.0f}")
-
-# -----------------------
-# RISK CONTROL
-# -----------------------
-st.markdown("### Controle du risque")
-
-ltv = st.slider("LTV global (%)", 0, 80, 30)
-
-if ltv < 35:
-    st.success("LTV sain")
-elif ltv < 50:
-    st.warning("LTV modere")
-else:
-    st.error("LTV eleve - risque de liquidation")
-
-# -----------------------
-# WALLET SCORING SYSTEM
-# -----------------------
-st.markdown("### Scoring global du wallet")
+monthly = total * apr / 100 / 12
+st.metric("Cashflow mensuel estime", f"${monthly:,.0f}")
 
 score = 0
+score += 25 if total >= 100000 else 18 if total >= 50000 else 12 if total >= 20000 else 6
+score += 20 if stable/total if total > 0 else 0 >= 0.15 else 10
+score += 20 if ltv < 35 else 10 if ltv < 50 else 0
 
-# Taille du treasury
-if total_treasury >= 100000:
-    score += 25
-elif total_treasury >= 50000:
-    score += 18
-elif total_treasury >= 20000:
-    score += 12
-else:
-    score += 6
+st.metric("Score du wallet", f"{score}/100")
 
-# Diversification
-non_zero_assets = treasury_df[treasury_df["Valeur ($)"] > 0].shape[0]
-if non_zero_assets >= 4:
-    score += 20
-elif non_zero_assets == 3:
-    score += 15
-elif non_zero_assets == 2:
-    score += 10
-else:
-    score += 5
-
-# Stablecoin buffer
-stable_ratio = (
-    treasury_df.loc[treasury_df["Asset"] == "Stablecoins", "Valeur ($)"].values[0]
-    / total_treasury if total_treasury > 0 else 0
-)
-
-if 0.15 <= stable_ratio <= 0.35:
-    score += 20
-elif stable_ratio > 0:
-    score += 10
-else:
-    score += 0
-
-# LTV
-if ltv < 35:
-    score += 20
-elif ltv < 50:
-    score += 10
-else:
-    score += 0
-
-# Cohérence avec profil sélectionné
-if strategy_choice == "SAFE" and ltv < 35:
-    score += 15
-elif strategy_choice == "MID" and ltv < 50:
-    score += 15
-elif strategy_choice == "DEGEN":
-    score += 10
-
-# Score final
-st.metric("Score du wallet", f"{score} / 100")
-
-if score >= 80:
-    st.success("Wallet tres solide et bien structure")
-elif score >= 60:
-    st.warning("Wallet correct mais optimisable")
-else:
-    st.error("Wallet fragile ou trop risque")
-
-# -----------------------
-# ACTION PLAN
-# -----------------------
-st.markdown("### Plan d'action recommande")
-
-actions = []
-
-if stable_ratio < 0.15:
-    actions.append("Augmenter le buffer en stablecoins")
-if ltv > 45:
-    actions.append("Reduire le leverage")
-if monthly_cashflow < 500:
-    actions.append("Augmenter l'exposition aux strategies SAFE")
-if total_treasury < 50000:
-    actions.append("Priorite a l'accumulation long terme")
-
-if actions:
-    for a in actions:
-        st.info(a)
-else:
-    st.success("Aucune action critique requise")
-
-# -----------------------
-# FOOTER
-# -----------------------
-st.markdown("""
-<div style="text-align:center; font-size:13px; color:#6b7280; margin-top:40px;">
-Module Business Plan et Scoring Wallet
-<br>
-Analyse locale uniquement - aucune donnee stockee
-</div>
-""", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)

@@ -320,7 +320,6 @@ with left:
     for asset in ASSETS:
         portfolio[asset] = st.number_input(asset.upper(), min_value=0.0, value=0.0, step=100.0, format="%.2f")
 
-    st.markdown('<div class="section-title">Répartition SAFE / MID / DEGEN</div>', unsafe_allow_html=True)
     st.markdown('<div class="section-title">Répartition SAFE / MID / DEGEN (cible)</div>', unsafe_allow_html=True)
     safe_pct = st.slider("SAFE", 0, 100, 40)
     mid_pct = st.slider("MID", 0, 100, 60)
@@ -370,10 +369,8 @@ with right:
         })
 
         # =======================
-        # Répartition du profil de risque avec jauge 3 segments
         # Répartition du profil de risque avec jauge calculée sur wallet actuel
         # =======================
-        st.markdown('<div class="section-title">Répartition du profil de risque</div>', unsafe_allow_html=True)
         st.markdown('<div class="section-title">Répartition du profil de risque (actuel wallet)</div>', unsafe_allow_html=True)
         # Calcul SAFE/MID/DEGEN réels selon la composition cible
         safe_val = sum(current[a]*STRATEGIES["SAFE"]["targets"][a] for a in ASSETS)
@@ -386,9 +383,6 @@ with right:
 
         st.markdown(f"""
         <div class="gauge-container">
-            <div class="gauge-segment safe" style="width:{safe_pct*100}%"></div>
-            <div class="gauge-segment mid" style="width:{mid_pct*100}%"></div>
-            <div class="gauge-segment degen" style="width:{degen_pct*100}%"></div>
             <div class="gauge-segment safe" style="width:{safe_ratio*100}%"></div>
             <div class="gauge-segment mid" style="width:{mid_ratio*100}%"></div>
             <div class="gauge-segment degen" style="width:{degen_ratio*100}%"></div>

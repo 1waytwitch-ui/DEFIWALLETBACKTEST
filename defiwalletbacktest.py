@@ -276,10 +276,10 @@ st.write(f"Score de sécurité : {score}/{len(checklist_items)}")
 # =======================
 # Profil visuel
 # =======================
-if score <= 3:
+if score <= 4:
     prof_color = "red"
     prof_text = "Risque élevé"
-elif score <= 5:
+elif score <= 6:
     prof_color = "orange"
     prof_text = "Risque moyen"
 else:

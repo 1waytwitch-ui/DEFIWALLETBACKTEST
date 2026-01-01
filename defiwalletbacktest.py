@@ -217,22 +217,22 @@ if not st.session_state.authenticated:
 STRATEGIES = {
     "SAFE": {
         "description": "Préservation du capital",
-        "targets": {"hodl": 0.15, "lending": 0.70, "liquidity_pool": 0.10, "borrowing": 0.05},
+        "targets": {"BTC": 0.50, "lending": 0.70, "borrowing": 0.05, "hodl": 0.15, "liquidity_pool": 0.10},
         "threshold": 0.05
     },
     "MID": {
         "description": "Rendement équilibré",
-        "targets": {"hodl": 0.10, "lending": 0.50, "liquidity_pool": 0.25, "borrowing": 0.15},
+        "targets": {"BTC": 0.30, "lending": 0.50, "borrowing": 0.15, "hodl": 0.10, "liquidity_pool": 0.25},
         "threshold": 0.05
     },
     "DEGEN": {
-        "description": "Rendement agressif et risques très élevès",
-        "targets": {"hodl": 0.05, "lending": 0.25, "liquidity_pool": 0.50, "borrowing": 0.20},
+        "description": "Rendement agressif et risques très élevés",
+        "targets": {"BTC": 0.10, "lending": 0.25, "borrowing": 0.20, "hodl": 0.05, "liquidity_pool": 0.50},
         "threshold": 0.10
     }
 }
 
-ASSETS = ["hodl", "lending", "liquidity_pool", "borrowing"]
+ASSETS = ["BTC", "lending", "borrowing", "hodl", "liquidity_pool"]
 
 def normalize(portfolio):
     total = sum(portfolio[a] for a in ASSETS)
@@ -300,7 +300,6 @@ else:
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-
 # =======================
 # UI PRINCIPAL (après checklist validée)
 # =======================
@@ -314,7 +313,7 @@ with left:
     for asset in ASSETS:
         portfolio[asset] = st.number_input(asset.upper(), min_value=0.0, value=0.0, step=100.0, format="%.2f")
 
-    st.markdown('<div class="section-title">Répartition du wallet SAFE / MID / DEGEN</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Répartition SAFE / MID / DEGEN</div>', unsafe_allow_html=True)
     safe_pct = st.slider("SAFE", 0, 100, 60)
     mid_pct = st.slider("MID", 0, 100, 30)
     degen_pct = st.slider("DEGEN", 0, 100, 10)
@@ -360,6 +359,7 @@ with right:
         st.progress(int(safe_pct*100), text="SAFE")
         st.progress(int(mid_pct*100), text="MID")
         st.progress(int(degen_pct*100), text="DEGEN")
+        st.write("Incluant BTC natif comme actif principal à accumuler")
 
         st.markdown('<div class="section-title">Répartition par type d\'actif</div>', unsafe_allow_html=True)
         for asset in ASSETS:

@@ -180,17 +180,20 @@ if st.session_state.show_disclaimer:
         font-size: 15px;
     ">
     <b>⚠️ DISCLAIMER IMPORTANT</b><br>
-L’accès au backtest est réservé aux membres de la <b>Team Élite KBOUR Crypto</b>.  
-Le code d’accès est disponible dans le canal privé <b>« DEFI Académie »</b>.<br><br>
+    L’accès au backtest est réservé aux membres de la <b>Team Élite KBOUR Crypto</b>.
+    Le code d’accès est disponible dans le canal privé <b>« DEFI Académie »</b>.<br><br>
 
-<b>🔐 Confidentialité & données</b><br>
-Les valeurs du wallet sont traitées <b>uniquement en local dans le navigateur</b> durant la session.
-Aucune donnée personnelle, adresse de wallet ou information sensible n’est enregistrée, transmise ou exploitée sur un serveur externe.<br><br>
+    <b>🔐 Confidentialité & données</b><br>
+    Les valeurs du wallet sont traitées <b>uniquement en local dans le navigateur</b> durant la session.
+    Aucune donnée personnelle, adresse de wallet ou information sensible n’est enregistrée, transmise ou exploitée sur un serveur externe.<br><br>
 
-<b>Nature de l’analyse</b><br>
-L’analyse est <b>purement statistique et indicative</b>, basée uniquement sur la répartition SAFE / MID / DEGEN.
-Les résultats ne tiennent pas compte de la situation personnelle, des conditions de marché en temps réel ou de paramètres externes
-et <b>ne constituent en aucun cas un conseil financier ou une recommandation d’investissement</b>.
+    <b>Nature de l’analyse</b><br>
+    L’analyse est <b>purement statistique et indicative</b>, basée uniquement sur la répartition SAFE / MID / DEGEN.
+    Les résultats ne tiennent pas compte de la situation personnelle, des conditions de marché en temps réel ou de paramètres externes
+    et <b>ne constituent en aucun cas un conseil financier ou une recommandation d’investissement</b>.
+    </div>
+    """, unsafe_allow_html=True)
+
 
 
 # -----------------------

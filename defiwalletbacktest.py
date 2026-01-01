@@ -289,12 +289,17 @@ else:
 st.markdown(f"<div style='font-weight:700; color:{prof_color}; font-size:20px'>Profil de sécurité : {prof_text}</div>", unsafe_allow_html=True)
 st.progress(int(score/len(checklist_items)*100))
 
-if score < len(checklist_items):
-    st.warning("⚠️ Veuillez compléter tous les points de la checklist avant d'utiliser l'outil.")
+# =======================
+# Blocage / déblocage selon profil
+# =======================
+if prof_text == "Risque élevé":
+    st.warning("⚠️ Votre profil est à risque élevé. Vous ne pouvez pas utiliser l'outil tant que la checklist n'est pas améliorée.")
     st.stop()
 else:
-    st.success("✅ Checklist complète, vous pouvez continuer l'analyse.")
+    st.success("✅ Profil suffisant, vous pouvez continuer l'analyse.")
+
 st.markdown('</div>', unsafe_allow_html=True)
+
 
 # =======================
 # UI PRINCIPAL (après checklist validée)

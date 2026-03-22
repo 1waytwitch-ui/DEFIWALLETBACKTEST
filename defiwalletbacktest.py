@@ -169,11 +169,11 @@ if not st.session_state.initialized:
 # INPUTS
 # =======================
 
-st.markdown("### Saisie du portefeuille")
+st.markdown("### Saisie du portefeuille en $")
 
 col1, col2 = st.columns(2)
 
-ASSETS = ["BTC", "Lending", "Borrowing", "HODL", "LP"]
+ASSETS = ["BTC NATIF", "Lending", "Borrowing", "HODL", "LP"]
 
 portfolio = {}
 
@@ -204,7 +204,7 @@ def lp_score(current):
         current["LP"] * 40 +
         current["Lending"] * 20 +
         (1 - current["Borrowing"]) * 20 +
-        current["BTC"] * 20
+        current["BTC NATIF"] * 20
     ) * 100
     return score
 

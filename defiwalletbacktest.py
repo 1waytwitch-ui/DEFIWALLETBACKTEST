@@ -1,306 +1,147 @@
 import streamlit as st
-import time
-import random
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 
 # =======================
 # CONFIG
 # =======================
-
-st.set_page_config(
-    page_title="DEFI WALLET BACKTEST",
-    layout="wide"
-)
+st.set_page_config(page_title="LP BACKTEST ENGINE", layout="wide")
 
 # =======================
-# STYLE
+# STYLE TERMINAL DARK
 # =======================
-
 st.markdown("""
 <style>
-
 html, body, [data-testid="stAppViewContainer"] {
     background-color: #0b0f0c !important;
     color: #00ff88 !important;
+}
+
+.card {
+    background-color: #000;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #00ff88;
+    margin-bottom: 20px;
+    box-shadow: 0 0 15px rgba(0,255,150,0.1);
+}
+
+.title {
     font-family: monospace;
-}
-
-.deFi-banner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 70px;
-    z-index: 9999;
-    background: linear-gradient(135deg, #0b0f14 0%, #141a2a 40%, #1c2338 100%);
-    padding: 15px 20px;
-    display: flex;
-    align-items: center;
-}
-
-.deFi-title-text {
-    font-size: 22px;
-    font-weight: 700;
-    color: #00ff88;
-}
-
-[data-testid="stAppViewContainer"] {
-    margin-top: 80px;
-}
-
-.terminal {
-    background-color: #000000;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #00ff88;
-    margin-bottom: 15px;
-}
-
-.stNumberInput input {
-    background-color: #000000 !important;
-    color: #00ff88 !important;
-    border: 1px solid #00ff88 !important;
-}
-
-.stButton button {
-    background-color: #000000;
-    color: #00ff88;
-    border: 1px solid #00ff88;
-}
-
-.gauge {
-    display: flex;
-    height: 25px;
-    border-radius: 6px;
-    overflow: hidden;
+    font-size: 20px;
     margin-bottom: 10px;
 }
 
-.safe { background: #00ff88; }
-.mid { background: #ffaa00; }
-.degen { background: #ff0055; }
-
+.metric {
+    font-size: 18px;
+    font-weight: bold;
+}
 </style>
-
-<div class="deFi-banner">
-    <div class="deFi-title-text">DEFI WALLET BACKTEST</div>
-</div>
 """, unsafe_allow_html=True)
 
-# =======================
-# STATE
-# =======================
-
-if "terminal" not in st.session_state:
-    st.session_state.terminal = []
-
-if "initialized" not in st.session_state:
-    st.session_state.initialized = False
-
-terminal_placeholder = st.empty()
-
-def render():
-    terminal_placeholder.markdown(
-        "<div class='terminal'>" +
-        "<br>".join(st.session_state.terminal) +
-        "</div>",
-        unsafe_allow_html=True
-    )
-
-def type_line(line):
-    current = ""
-    st.session_state.terminal.append("")
-    for char in line:
-        current += char
-        st.session_state.terminal[-1] = current
-        render()
-        time.sleep(random.uniform(0.002, 0.008))
-
-# =======================
-# INIT
-# =======================
-
-if not st.session_state.initialized:
-    type_line("$ wallet-backtest --boot")
-    type_line("> IA LP Engine chargé")
-    type_line("> SAFE / MID / DEGEN prêt")
-    type_line("> En attente input utilisateur...")
-    st.session_state.initialized = True
+st.markdown("# 🧪 LP BACKTEST ENGINE")
 
 # =======================
 # INPUTS
 # =======================
-
-st.markdown("### Saisie du portefeuille")
-
 col1, col2 = st.columns(2)
 
-ASSETS = ["BTC", "Lending", "Borrowing", "HODL", "LP"]
-
-portfolio = {}
-
 with col1:
-    for asset in ASSETS:
-        portfolio[asset] = st.number_input(asset, min_value=0.0, step=100.0)
+    apr = st.number_input("APR (%)", value=20.0)
+    il = st.number_input("Impermanent Loss (%)", value=5.0)
+    fees = st.number_input("Fees (%)", value=10.0)
 
 with col2:
-    safe_pct = st.number_input("SAFE (%)", value=40.0)
-    mid_pct = st.number_input("MID (%)", value=40.0)
-    degen_pct = st.number_input("DEGEN (%)", value=20.0)
+    volatility = st.slider("Volatilité (%)", 0, 100, 50)
+    duration = st.slider("Durée (jours)", 1, 365, 30)
 
 run = st.button("▶ Lancer analyse")
 
 # =======================
-# LOGIQUE
-# =======================
-
-def normalize(p):
-    total = sum(p.values())
-    return {k: v/total if total > 0 else 0 for k,v in p.items()}
-
-def risk_score(degen, mid):
-    return (degen * 2 + mid) * 100
-
-def lp_score(current):
-    score = (
-        current["LP"] * 40 +
-        current["Lending"] * 20 +
-        (1 - current["Borrowing"]) * 20 +
-        current["BTC"] * 20
-    ) * 100
-    return score
-
-def detect_actions(current):
-    actions = []
-    for k,v in current.items():
-        if v > 0.4:
-            actions.append(f"REDUIRE {k}")
-        elif v < 0.05:
-            actions.append(f"AUGMENTER {k}")
-    return actions
-
-# =======================
 # ANALYSE
 # =======================
-
 if run:
 
-    total = sum(portfolio.values())
+    st.markdown('<div class="card">', unsafe_allow_html=True)
 
-    if total == 0:
-        type_line("> ERREUR : portefeuille vide")
+    # Score IA LP
+    score = (
+        apr * 0.4 +
+        fees * 0.3 -
+        il * 0.2 -
+        volatility * 0.1
+    )
+
+    score = max(0, min(100, score))
+
+    st.markdown("### 🤖 Score IA LP")
+    st.progress(int(score))
+
+    # Interprétation
+    if score > 70:
+        st.success("🔥 Setup très performant (alpha)")
+        level = "SAFE"
+    elif score > 40:
+        st.warning("⚖️ Setup équilibré")
+        level = "MID"
     else:
-        current = normalize(portfolio)
+        st.error("⚠️ Setup risqué")
+        level = "DEGEN"
 
-        total_pct = safe_pct + mid_pct + degen_pct
-        safe = safe_pct / total_pct if total_pct else 0
-        mid = mid_pct / total_pct if total_pct else 0
-        degen = degen_pct / total_pct if total_pct else 0
+    st.markdown(f"**Niveau détecté : {level}**")
 
-        type_line("")
-        type_line("> Analyse en cours...")
+    # =======================
+    # RADAR CHART (PLUS PETIT)
+    # =======================
+    labels = ["APR", "Fees", "IL", "Volatilité"]
+    values = [apr, fees, il, volatility]
 
-        # JAUGE
-        gauge_placeholder = st.empty()
-        for i in range(0, 101, 5):
-            gauge_placeholder.markdown(f"""
-            <div class="gauge">
-                <div class="safe" style="width:{safe*100 * i/100}%"></div>
-                <div class="mid" style="width:{mid*100 * i/100}%"></div>
-                <div class="degen" style="width:{degen*100 * i/100}%"></div>
-            </div>
-            """, unsafe_allow_html=True)
-            time.sleep(0.01)
+    angles = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
+    values = np.concatenate((values, [values[0]]))
+    angles = np.concatenate((angles, [angles[0]]))
 
-        # SCORE
-        score = risk_score(degen, mid)
-        type_line(f"> SCORE RISQUE : {score:.1f}/100")
+    fig = plt.figure(figsize=(3,3))  # 👈 plus petit
+    ax = fig.add_subplot(111, polar=True)
 
-        # LP IA
-        lp = lp_score(current)
-        type_line(f"> SCORE IA LP : {lp:.1f}/100")
+    ax.plot(angles, values)
+    ax.fill(angles, values, alpha=0.1)
 
-        # =======================
-        # RADAR PETIT FORMAT
-        # =======================
+    ax.set_xticks(angles[:-1])
+    ax.set_xticklabels(labels)
 
-        st.markdown("### Radar Allocation")
+    st.markdown("### 📊 Radar allocation")
+    st.pyplot(fig)
 
-        labels = list(current.keys())
-        values = list(current.values())
+    # =======================
+    # RECOMMANDATIONS IA
+    # =======================
+    st.markdown("### 🧠 Recommandations IA")
 
-        angles = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
-        values += values[:1]
-        angles = np.concatenate((angles, [angles[0]]))
+    if il > 10:
+        st.warning("Réduire l'exposition → IL trop élevée")
 
-        fig = plt.figure(figsize=(3,3))  # 👈 PLUS PETIT
-        ax = fig.add_subplot(111, polar=True)
+    if volatility > 70:
+        st.warning("Marché très volatile → resserrer range LP")
 
-        ax.plot(angles, values)
-        ax.fill(angles, values, alpha=0.1)
+    if apr < 15:
+        st.info("APR faible → optimiser pool ou incentives")
 
-        ax.set_xticks(angles[:-1])
-        ax.set_xticklabels(labels, fontsize=8)  # 👈 plus lisible petit
+    if fees > apr:
+        st.success("Bonne capture de fees 👍")
 
-        ax.set_yticklabels([])  # 👈 enlève bruit visuel
+    if score > 70:
+        st.success("Stratégie optimisée 🔥")
 
-        st.pyplot(fig)
-
-        # RECO
-        actions = detect_actions(current)
-        type_line("> Recommandations :")
-
-        if actions:
-            for a in actions:
-                type_line(f"> {a}")
-        else:
-            type_line("> Portefeuille équilibré")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # =======================
 # DISCLAIMER
 # =======================
-
-st.markdown("### ")
-
-if "disclaimer_done" not in st.session_state:
-    st.session_state.disclaimer_done = False
-    st.session_state.disclaimer_content = []
-
-disclaimer_placeholder = st.empty()
-
-def type_disclaimer(line):
-    current = ""
-    st.session_state.disclaimer_content.append("")
-    for char in line:
-        current += char
-        st.session_state.disclaimer_content[-1] = current
-        disclaimer_placeholder.markdown(
-            "<div class='terminal'>" +
-            "<br>".join(st.session_state.disclaimer_content) +
-            "</div>",
-            unsafe_allow_html=True
-        )
-        time.sleep(random.uniform(0.01, 0.03))
-
-if not st.session_state.disclaimer_done:
-
-    disclaimer_lines = [
-        "⚠️ DISCLAIMER",
-        "Analyse indicative uniquement",
-        "Pas un conseil financier",
-        "DYOR"
-    ]
-
-    for line in disclaimer_lines:
-        type_disclaimer(line)
-
-    st.session_state.disclaimer_done = True
-
-else:
-    disclaimer_placeholder.markdown(
-        "<div class='terminal'>" +
-        "<br>".join(st.session_state.disclaimer_content) +
-        "</div>",
-        unsafe_allow_html=True
-    )
+st.markdown("""
+<div class="card">
+⚠️ DISCLAIMER  
+Outil informatif uniquement  
+Aucun conseil financier  
+DYOR
+</div>
+""", unsafe_allow_html=True)

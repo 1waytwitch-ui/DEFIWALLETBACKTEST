@@ -234,18 +234,21 @@ if run:
         values += values[:1]
         angles = np.concatenate((angles, [angles[0]]))
 
-        fig = plt.figure(figsize=(3,3))  # 👈 PLUS PETIT
+        fig = plt.figure(figsize=(2.2, 2.2))  # 👈 PLUS PETIT
         ax = fig.add_subplot(111, polar=True)
 
         ax.plot(angles, values)
         ax.fill(angles, values, alpha=0.1)
 
         ax.set_xticks(angles[:-1])
-        ax.set_xticklabels(labels, fontsize=8)  # 👈 plus lisible petit
+        ax.set_xticklabels(labels, fontsize=7)  # 👈 plus compact
 
-        ax.set_yticklabels([])  # 👈 enlève bruit visuel
+        ax.set_yticklabels([])
 
-        st.pyplot(fig)
+        # Centrer le radar
+        col_left, col_mid, col_right = st.columns([1,2,1])
+        with col_mid:
+            st.pyplot(fig, use_container_width=False)
 
         # RECO
         actions = detect_actions(current)

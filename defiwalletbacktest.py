@@ -14,20 +14,28 @@ st.set_page_config(
 )
 
 # =======================
-# STYLE
+# STYLE TERMINAL VERT
 # =======================
 
 st.markdown("""
 <style>
+/* Fond et texte général */
+html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebar"] {
+    background-color: #0b0f0c !important;
+    color: #00ff88 !important;
+    font-family: "Courier New", monospace !important;
+}
+
+/* Header fixe */
 .deFi-banner {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 70px;  /* plus compact */
+    height: 70px;
     z-index: 9999;
     background: linear-gradient(135deg, #0b0f14 0%, #141a2a 40%, #1c2338 100%);
-    padding: 15px 20px;  /* réduit */
+    padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -37,24 +45,22 @@ st.markdown("""
 
 /* Titre */
 .deFi-title-text {
-    font-size: 24px;  /* plus petit */
+    font-size: 24px;
     font-weight: 700;
-    color: #00ff88 !important;  /* style terminal vert */
-    font-family: "Courier New", monospace;
+    color: #00ff88 !important;
 }
 
 /* Boutons compact terminal style */
 .deFi-buttons a {
     color: #00ff88;
-    font-size: 12px;  /* plus petit */
+    font-size: 12px;
     font-weight: 600;
     text-decoration: none;
-    padding: 4px 10px;  /* moins de padding */
+    padding: 4px 10px;
     border-radius: 6px;
     margin-left: 6px;
-    background-color: #11161d;  /* fond sombre style terminal */
+    background-color: #11161d;
     border: 1px solid #00ff88;
-    font-family: "Courier New", monospace;
     transition: 0.2s all;
 }
 
@@ -63,10 +69,42 @@ st.markdown("""
     box-shadow: 0 0 8px #00ff88;
 }
 
-/* Décaler le reste du contenu */
+/* Décaler le contenu */
 [data-testid="stAppViewContainer"] {
-    margin-top: 70px;  /* correspond à la hauteur du header */
+    margin-top: 70px;
 }
+
+/* Inputs / Number / Buttons */
+.stNumberInput input,
+.stTextInput input,
+.stButton button {
+    background-color: #0b0f0c !important;
+    color: #00ff88 !important;
+    border: 1px solid #00ff88 !important;
+    font-family: "Courier New", monospace !important;
+}
+
+/* Terminal style output */
+.terminal {
+    background-color: #000000;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #00ff88;
+    margin-bottom: 15px;
+}
+
+/* Jauge SAFE/MID/DEGEN */
+.gauge {
+    display: flex;
+    height: 25px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+.safe { background: #00ff88; }
+.mid { background: #ffaa00; }
+.degen { background: #ff0055; }
+
 </style>
 
 <div class="deFi-banner">
@@ -232,11 +270,11 @@ if run:
         fig = plt.figure(figsize=(2.2, 2.2))
         ax = fig.add_subplot(111, polar=True)
 
-        ax.plot(angles, values)
-        ax.fill(angles, values, alpha=0.1)
+        ax.plot(angles, values, color="#00ff88")
+        ax.fill(angles, values, alpha=0.1, facecolor="#00ff88")
 
         ax.set_xticks(angles[:-1])
-        ax.set_xticklabels(labels, fontsize=7)
+        ax.set_xticklabels(labels, fontsize=7, color="#00ff88")
 
         ax.set_yticklabels([])
 

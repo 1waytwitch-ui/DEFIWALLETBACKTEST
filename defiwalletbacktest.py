@@ -1,6 +1,8 @@
 import streamlit as st
 import time
 import random
+import matplotlib.pyplot as plt
+import numpy as np
 
 # =======================
 # CONFIG
@@ -12,7 +14,7 @@ st.set_page_config(
 )
 
 # =======================
-# STYLE TERMINAL
+# STYLE
 # =======================
 
 st.markdown("""
@@ -52,7 +54,6 @@ html, body, [data-testid="stAppViewContainer"] {
     padding: 15px;
     border-radius: 8px;
     border: 1px solid #00ff88;
-    box-shadow: 0 0 10px rgba(0,255,150,0.2);
     margin-bottom: 15px;
 }
 
@@ -126,8 +127,8 @@ def type_line(line):
 
 if not st.session_state.initialized:
     type_line("$ wallet-backtest --boot")
-    type_line("> Chargement modules...")
-    type_line("> SAFE / MID / DEGEN engine ready")
+    type_line("> IA LP Engine chargé")
+    type_line("> SAFE / MID / DEGEN prêt")
     type_line("> En attente input utilisateur...")
     st.session_state.initialized = True
 
@@ -165,6 +166,16 @@ def normalize(p):
 def risk_score(degen, mid):
     return (degen * 2 + mid) * 100
 
+def lp_score(current):
+    # scoring IA simplifié LP
+    score = (
+        current["LP"] * 40 +
+        current["Lending"] * 20 +
+        (1 - current["Borrowing"]) * 20 +
+        current["BTC"] * 20
+    ) * 100
+    return score
+
 def detect_actions(current):
     actions = []
     for k,v in current.items():
@@ -173,6 +184,10 @@ def detect_actions(current):
         elif v < 0.05:
             actions.append(f"AUGMENTER {k}")
     return actions
+
+# =======================
+# ANALYSE
+# =======================
 
 if run:
 
@@ -190,12 +205,9 @@ if run:
 
         type_line("")
         type_line("> Analyse en cours...")
-        type_line(f"> SAFE : {safe:.1%}")
-        type_line(f"> MID : {mid:.1%}")
-        type_line(f"> DEGEN : {degen:.1%}")
 
         # =======================
-        # JAUGE ANIMÉE
+        # JAUGE
         # =======================
 
         gauge_placeholder = st.empty()
@@ -208,7 +220,7 @@ if run:
                 <div class="degen" style="width:{degen*100 * i/100}%"></div>
             </div>
             """, unsafe_allow_html=True)
-            time.sleep(0.02)
+            time.sleep(0.01)
 
         # =======================
         # SCORE RISQUE
@@ -227,6 +239,46 @@ if run:
         type_line(f"> PROFIL : {level}")
 
         # =======================
+        # IA LP SCORE
+        # =======================
+
+        lp = lp_score(current)
+
+        if lp > 70:
+            lp_msg = "Optimisé LP"
+        elif lp > 40:
+            lp_msg = "Correct mais améliorable"
+        else:
+            lp_msg = "Sous-optimal"
+
+        type_line(f"> SCORE IA LP : {lp:.1f}/100")
+        type_line(f"> ANALYSE LP : {lp_msg}")
+
+        # =======================
+        # RADAR CHART
+        # =======================
+
+        st.markdown("### Radar Allocation")
+
+        labels = list(current.keys())
+        values = list(current.values())
+
+        angles = np.linspace(0, 2*np.pi, len(labels), endpoint=False)
+        values += values[:1]
+        angles = np.concatenate((angles, [angles[0]]))
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, polar=True)
+
+        ax.plot(angles, values)
+        ax.fill(angles, values, alpha=0.1)
+
+        ax.set_xticks(angles[:-1])
+        ax.set_xticklabels(labels)
+
+        st.pyplot(fig)
+
+        # =======================
         # RECOMMANDATIONS
         # =======================
 
@@ -241,16 +293,16 @@ if run:
             type_line("> Portefeuille équilibré")
 
 # =======================
-# DISCLAIMER TERMINAL
+# DISCLAIMER
 # =======================
 
 st.markdown("### ")
 
-disclaimer_placeholder = st.empty()
-
 if "disclaimer_done" not in st.session_state:
     st.session_state.disclaimer_done = False
     st.session_state.disclaimer_content = []
+
+disclaimer_placeholder = st.empty()
 
 def type_disclaimer(line):
     current = ""

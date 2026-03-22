@@ -286,10 +286,34 @@ def type_disclaimer(line):
 if not st.session_state.disclaimer_done:
 
     disclaimer_lines = [
-        "⚠️ DISCLAIMER",
-        "Analyse indicative uniquement",
-        "Pas un conseil financier",
-        "DYOR"
+        "⚠️ SYSTEM DISCLAIMER LOADED",
+        "----------------------------------------",
+        "",
+        "> Cet outil analyse uniquement la répartition",
+        "> de votre portefeuille entre différentes catégories d'actifs.",
+        "",
+        "> Les résultats sont basés sur des modèles théoriques",
+        "> de stratégie (SAFE / MID / DEGEN) et de pondération.",
+        "",
+        "> Cette analyse ne prend pas en compte :",
+        "> - votre situation personnelle",
+        "> - les conditions de marché en temps réel",
+        "> - les variations de prix ou de liquidité",
+        "",
+        "> Les allocations proposées sont indicatives",
+        "> et peuvent ne pas être adaptées à votre profil.",
+        "",
+        "> Aucune donnée n'est stockée ou transmise",
+        "> toutes les informations restent locales.",
+        "",
+        "> Cet outil ne constitue PAS :",
+        "> - un conseil en investissement",
+        "> - une recommandation personnalisée",
+        "",
+        "> Vous êtes seul responsable de vos décisions.",
+        "> Faites vos propres recherches (DYOR).",
+        "",
+        "----------------------------------------"
     ]
 
     for line in disclaimer_lines:

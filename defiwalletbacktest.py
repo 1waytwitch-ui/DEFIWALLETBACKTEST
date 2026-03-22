@@ -31,7 +31,7 @@ st.markdown("""
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
+    border-bottom: 1px solid rgba(0,255,136,0.3);
     box-shadow: 0px 4px 18px rgba(0,0,0,0.45);
 }
 

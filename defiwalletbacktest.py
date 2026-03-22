@@ -255,7 +255,7 @@ if run:
         type_line(f"> SCORE IA LP : {lp:.1f}/100")
 
         # =======================
-        # RADAR
+        # RADAR AVEC FOND APPLI
         # =======================
 
         st.markdown("### Radar Allocation")
@@ -267,18 +267,16 @@ if run:
         values += values[:1]
         angles = np.concatenate((angles, [angles[0]]))
 
-        fig = plt.figure(figsize=(2.2, 2.2))
-        ax = fig.add_subplot(111, polar=True)
+        fig = plt.figure(figsize=(2.2, 2.2), facecolor="#0b0f0c")  # fond app
+        ax = fig.add_subplot(111, polar=True, facecolor="#0b0f0c")      # fond radar
 
         ax.plot(angles, values, color="#00ff88")
-        ax.fill(angles, values, alpha=0.1, facecolor="#00ff88")
+        ax.fill(angles, values, alpha=0.2, facecolor="#00ff88")
 
         ax.set_xticks(angles[:-1])
         ax.set_xticklabels(labels, fontsize=7, color="#00ff88")
-
         ax.set_yticklabels([])
 
-        # Centrer le radar
         col_left, col_mid, col_right = st.columns([1,2,1])
         with col_mid:
             st.pyplot(fig, use_container_width=False)

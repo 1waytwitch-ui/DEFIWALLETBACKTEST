@@ -10,8 +10,8 @@ import numpy as np
 
 st.set_page_config(
     page_title="DEFI WALLET BACKTEST",
-    layout="wide"
-)
+     page_icon="🪙",
+    layout="centered"
 
 # =======================
 # STYLE TERMINAL VERT

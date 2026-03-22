@@ -19,72 +19,67 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-
-html, body, [data-testid="stAppViewContainer"] {
-    background-color: #0b0f0c !important;
-    color: #00ff88 !important;
-    font-family: monospace;
-}
-
 .deFi-banner {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 70px;
+    height: 70px;  /* plus compact */
     z-index: 9999;
     background: linear-gradient(135deg, #0b0f14 0%, #141a2a 40%, #1c2338 100%);
-    padding: 15px 20px;
+    padding: 15px 20px;  /* réduit */
     display: flex;
+    justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0px 4px 18px rgba(0,0,0,0.45);
 }
 
+/* Titre */
 .deFi-title-text {
-    font-size: 22px;
+    font-size: 24px;  /* plus petit */
     font-weight: 700;
+    color: #00ff88 !important;  /* style terminal vert */
+    font-family: "Courier New", monospace;
+}
+
+/* Boutons compact terminal style */
+.deFi-buttons a {
     color: #00ff88;
-}
-
-[data-testid="stAppViewContainer"] {
-    margin-top: 80px;
-}
-
-.terminal {
-    background-color: #000000;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #00ff88;
-    margin-bottom: 15px;
-}
-
-.stNumberInput input {
-    background-color: #000000 !important;
-    color: #00ff88 !important;
-    border: 1px solid #00ff88 !important;
-}
-
-.stButton button {
-    background-color: #000000;
-    color: #00ff88;
-    border: 1px solid #00ff88;
-}
-
-.gauge {
-    display: flex;
-    height: 25px;
+    font-size: 12px;  /* plus petit */
+    font-weight: 600;
+    text-decoration: none;
+    padding: 4px 10px;  /* moins de padding */
     border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 10px;
+    margin-left: 6px;
+    background-color: #11161d;  /* fond sombre style terminal */
+    border: 1px solid #00ff88;
+    font-family: "Courier New", monospace;
+    transition: 0.2s all;
 }
 
-.safe { background: #00ff88; }
-.mid { background: #ffaa00; }
-.degen { background: #ff0055; }
+.deFi-buttons a:hover {
+    background-color: #0b0f14;
+    box-shadow: 0 0 8px #00ff88;
+}
 
+/* Décaler le reste du contenu */
+[data-testid="stAppViewContainer"] {
+    margin-top: 70px;  /* correspond à la hauteur du header */
+}
 </style>
 
 <div class="deFi-banner">
-    <div class="deFi-title-text">DEFI WALLET BACKTEST</div>
+    <div class="deFi-title-text">LP STRATÉGIES BACKTEST ENGINE</div>
+    <div class="deFi-buttons">
+        <a href="https://defi.krystal.app/referral?r=3JwR8YRQCRJT" target="_blank">Krystal</a>
+        <a href="https://plusvalueimposable.streamlit.app/" target="_blank">Plus-value</a>
+        <a href="https://backtestenginelp.streamlit.app/" target="_blank">BACKTEST ENGINE LP</a>
+        <a href="https://t.me/Pigeonchanceux" target="_blank">
+            <img src="https://t.me/i/userpic/320/Pigeonchanceux.jpg" style="width:20px;height:20px;border-radius:50%; vertical-align: middle; margin-right:4px;">Telegram
+        </a>
+        <a href="https://shorturl.at/X3sYt" target="_blank">Formation</a>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -123,9 +118,9 @@ def type_line(line):
 
 if not st.session_state.initialized:
     type_line("$ wallet-backtest --boot")
-    type_line("> IA LP Engine chargé")
+    type_line("> WALLET Engine chargé")
     type_line("> SAFE / MID / DEGEN prêt")
-    type_line("> En attente input utilisateur...")
+    type_line("> En attente des entrées utilisateur...")
     st.session_state.initialized = True
 
 # =======================
@@ -222,7 +217,7 @@ if run:
         type_line(f"> SCORE IA LP : {lp:.1f}/100")
 
         # =======================
-        # RADAR PETIT FORMAT
+        # RADAR
         # =======================
 
         st.markdown("### Radar Allocation")
@@ -234,14 +229,14 @@ if run:
         values += values[:1]
         angles = np.concatenate((angles, [angles[0]]))
 
-        fig = plt.figure(figsize=(2.2, 2.2))  # 👈 PLUS PETIT
+        fig = plt.figure(figsize=(2.2, 2.2))
         ax = fig.add_subplot(111, polar=True)
 
         ax.plot(angles, values)
         ax.fill(angles, values, alpha=0.1)
 
         ax.set_xticks(angles[:-1])
-        ax.set_xticklabels(labels, fontsize=7)  # 👈 plus compact
+        ax.set_xticklabels(labels, fontsize=7)
 
         ax.set_yticklabels([])
 

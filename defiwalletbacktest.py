@@ -12,6 +12,7 @@ st.set_page_config(
     page_title="DEFI WALLET BACKTEST",
      page_icon="🪙",
     layout="centered"
+)    
 
 # =======================
 # STYLE TERMINAL VERT

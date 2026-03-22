@@ -98,10 +98,6 @@ if "terminal" not in st.session_state:
 if "initialized" not in st.session_state:
     st.session_state.initialized = False
 
-# =======================
-# TERMINAL ENGINE
-# =======================
-
 terminal_placeholder = st.empty()
 
 def render():
@@ -167,7 +163,6 @@ def risk_score(degen, mid):
     return (degen * 2 + mid) * 100
 
 def lp_score(current):
-    # scoring IA simplifié LP
     score = (
         current["LP"] * 40 +
         current["Lending"] * 20 +
@@ -206,12 +201,8 @@ if run:
         type_line("")
         type_line("> Analyse en cours...")
 
-        # =======================
         # JAUGE
-        # =======================
-
         gauge_placeholder = st.empty()
-
         for i in range(0, 101, 5):
             gauge_placeholder.markdown(f"""
             <div class="gauge">
@@ -222,40 +213,16 @@ if run:
             """, unsafe_allow_html=True)
             time.sleep(0.01)
 
-        # =======================
-        # SCORE RISQUE
-        # =======================
-
+        # SCORE
         score = risk_score(degen, mid)
-
-        if score < 30:
-            level = "SAFE"
-        elif score < 70:
-            level = "MODÉRÉ"
-        else:
-            level = "DEGEN"
-
         type_line(f"> SCORE RISQUE : {score:.1f}/100")
-        type_line(f"> PROFIL : {level}")
 
-        # =======================
-        # IA LP SCORE
-        # =======================
-
+        # LP IA
         lp = lp_score(current)
-
-        if lp > 70:
-            lp_msg = "Optimisé LP"
-        elif lp > 40:
-            lp_msg = "Correct mais améliorable"
-        else:
-            lp_msg = "Sous-optimal"
-
         type_line(f"> SCORE IA LP : {lp:.1f}/100")
-        type_line(f"> ANALYSE LP : {lp_msg}")
 
         # =======================
-        # RADAR CHART
+        # RADAR PETIT FORMAT
         # =======================
 
         st.markdown("### Radar Allocation")
@@ -267,23 +234,21 @@ if run:
         values += values[:1]
         angles = np.concatenate((angles, [angles[0]]))
 
-        fig = plt.figure()
+        fig = plt.figure(figsize=(3,3))  # 👈 PLUS PETIT
         ax = fig.add_subplot(111, polar=True)
 
         ax.plot(angles, values)
         ax.fill(angles, values, alpha=0.1)
 
         ax.set_xticks(angles[:-1])
-        ax.set_xticklabels(labels)
+        ax.set_xticklabels(labels, fontsize=8)  # 👈 plus lisible petit
+
+        ax.set_yticklabels([])  # 👈 enlève bruit visuel
 
         st.pyplot(fig)
 
-        # =======================
-        # RECOMMANDATIONS
-        # =======================
-
+        # RECO
         actions = detect_actions(current)
-
         type_line("> Recommandations :")
 
         if actions:

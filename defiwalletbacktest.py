@@ -21,6 +21,9 @@ st.set_page_config(
 # STYLE TERMINAL VERT
 # =======================
 
+# Forcer mode écran large
+st.set_page_config(layout="wide")
+
 st.markdown("""
 <style>
 /* Fond et texte général */
@@ -165,6 +168,9 @@ if not st.session_state.initialized:
     type_line("> En attente des entrées utilisateur...")
     st.session_state.initialized = True
 
+# Forcer mode écran large
+st.set_page_config(layout="wide")
+
 # =======================
 # INPUTS
 # =======================
@@ -217,6 +223,9 @@ def detect_actions(current):
             actions.append(f"AUGMENTER {k}")
     return actions
 
+# Forcer mode écran large
+st.set_page_config(layout="wide")
+
 # =======================
 # ANALYSE
 # =======================
@@ -258,6 +267,9 @@ if run:
         lp = lp_score(current)
         type_line(f"> SCORE IA LP : {lp:.1f}/100")
 
+# Forcer mode écran large
+st.set_page_config(layout="wide")
+
         # =======================
         # RADAR AVEC FOND APPLI
         # =======================
@@ -294,6 +306,9 @@ if run:
                 type_line(f"> {a}")
         else:
             type_line("> Portefeuille équilibré")
+
+# Forcer mode écran large
+st.set_page_config(layout="wide")
 
 # =======================
 # DISCLAIMER

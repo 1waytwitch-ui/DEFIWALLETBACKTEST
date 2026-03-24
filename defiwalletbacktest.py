@@ -267,8 +267,7 @@ if run:
         lp = lp_score(current)
         type_line(f"> SCORE IA LP : {lp:.1f}/100")
 
-# Forcer mode écran large
-st.set_page_config(layout="wide")
+
 
         # =======================
         # RADAR AVEC FOND APPLI

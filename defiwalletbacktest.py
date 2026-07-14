@@ -203,25 +203,7 @@ def card(label, value, color="var(--accent)", wide=False):
     st.markdown(f"""<div class="{cls}"><div class="m-label">{label}</div><div class="m-value" style="color:{color};">{value}</div></div>""", unsafe_allow_html=True)
 
 def render_term(placeholder, content, div_id="term-boot"):
-
     html = "<br>".join(content)
-
-    placeholder.markdown(
-        f"""
-<div id="{div_id}" class="term-block">
-{html}
-<span class="term-cursor"></span>
-</div>
-
-<script>
-var obj=document.getElementById("{div_id}");
-if(obj){{
-obj.scrollTop=obj.scrollHeight;
-}}
-</script>
-""",
-        unsafe_allow_html=True
-    )
     placeholder.markdown(
         f"<div id='{div_id}' class='term-block'>" +
         "<br>".join(content) +
@@ -232,9 +214,7 @@ obj.scrollTop=obj.scrollHeight;
 
 def type_line_to(content_list, placeholder, line, div_id="term-boot"):
     current = ""
-
     content_list.append("")
-
     for c in line:
         current += c
         content_list[-1] = current
@@ -322,11 +302,11 @@ if not st.session_state.boot_done:
         "  WALLET ENGINE READY ◈"
     ]
     for line in lines_boot:
-    add_term_line(
-        st.session_state.boot_content,
-        boot_ph,
-        line
-    )
+        add_term_line(
+            st.session_state.boot_content,
+            boot_ph,
+            line
+        )
 
     if not st.session_state.disc_shown:
         disc_lines = [
@@ -352,11 +332,12 @@ if not st.session_state.boot_done:
             "──────────────────────────────────────────────"
         ]
         for line in disc_lines:
-    add_term_line(
-        st.session_state.boot_content,
-        boot_ph,
-        line
-    )
+            add_term_line(
+                st.session_state.boot_content,
+                boot_ph,
+                line
+            )
+        st.session_state.disc_shown = True
 
     st.session_state.boot_done = True
 else:
@@ -434,20 +415,21 @@ if not st.session_state.checklist_validee:
         render_term(cl_ph, st.session_state.checklist_content, "cl-term")
         time.sleep(0.2)
         for item in checklist_items:
-    add_term_line(
-        st.session_state.checklist_content,
-        cl_ph,
-        f"  [✓] {item}",
-        "cl-term"
-    )
+            add_term_line(
+                st.session_state.checklist_content,
+                cl_ph,
+                f"  [✓] {item}",
+                "cl-term"
+            )
         bar = "█" * 20
-
-add_term_line(
-    st.session_state.checklist_content,
-    cl_ph,
-    f"▸ progress: [{bar}] {len(checklist_items)}/{len(checklist_items)} — READY",
-    "cl-term"
-)
+        add_term_line(
+            st.session_state.checklist_content,
+            cl_ph,
+            f"▸ progress: [{bar}] {len(checklist_items)}/{len(checklist_items)} — READY",
+            "cl-term"
+        )
+    else:
+        render_term(cl_ph, st.session_state.checklist_content, "cl-term")
 
     st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
     if st.button("◈ J'AI COMPRIS — ACCÉDER À L'ANALYSE", use_container_width=True):
@@ -678,9 +660,10 @@ if run:
         sec("△", "Radar d'allocation")
 
         labels_r = list(current.keys())
-        if sum(values_r := [current[k] * 100 for k in labels_r]) == 0:
-    st.warning("Impossible d'afficher le radar : portefeuille vide.")
-    st.stop()
+        values_r = [current[k] * 100 for k in labels_r]
+        if sum(values_r) == 0:
+            st.warning("Impossible d'afficher le radar : portefeuille vide.")
+            st.stop()
         colors_r = [colors_map.get(k, "#00d4aa") for k in labels_r]
 
         fig_radar = go.Figure()

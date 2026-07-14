@@ -782,7 +782,7 @@ if run:
 st.markdown("""
 <div style="height:40px;"></div>
 <div style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-lo); letter-spacing:1px;">
-    ◈ DEFI WALLET BACKTEST V2 · KBOUR CRYPTO · DYOR · NOT FINANCIAL ADVICE
+    ◈ DEFI WALLET BACKTEST V2 · PIGEON CHANCEUX LAB · DYOR · NOT FINANCIAL ADVICE
 </div>
 <div style="height:20px;"></div>
 """, unsafe_allow_html=True)
